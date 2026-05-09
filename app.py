@@ -179,7 +179,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     padding: 60px 20px;
     color: #475569;
 }
-.empty-state h2 { color: #94a3b8; font-size: 3.2rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -2px; line-height: 1.1; }
+.empty-state h2 { color: #94a3b8; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
 .empty-state p  { font-size: 0.85rem; line-height: 1.7; }
 
 /* ── PDF banner ── */
