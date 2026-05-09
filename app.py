@@ -12,7 +12,6 @@ import base64
 import tempfile
 import streamlit as st
 from chatbot import Chatbot, AVAILABLE_MODELS, DEFAULT_SYSTEM_PROMPT
-from audio_recorder_streamlit import audio_recorder
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
