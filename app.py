@@ -32,10 +32,23 @@ body, .stApp {
 section[data-testid="stSidebar"] {
     background-color: #1a1d27 !important;
     border-right: 1px solid #2d3148 !important;
-    min-width: 280px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+    transition: all 0.3s ease !important;
+}
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    min-width: 0px !important;
+    max-width: 0px !important;
+    overflow: hidden !important;
 }
 section[data-testid="stSidebar"] > div {
-    padding: 1rem !important;
+    padding: 0.6rem !important;
+}
+.main .block-container {
+    max-width: 100% !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    transition: padding 0.3s ease !important;
 }
 
 /* ── Sidebar text inputs ── */
@@ -71,11 +84,14 @@ section[data-testid="stSidebar"] .stButton > button {
     border: 1px solid #2d3148 !important;
     color: #94a3b8 !important;
     border-radius: 8px !important;
-    font-size: 0.82rem !important;
-    padding: 0.4rem 0.8rem !important;
-    margin-bottom: 4px !important;
+    font-size: 0.75rem !important;
+    padding: 0.3rem 0.6rem !important;
+    margin-bottom: 3px !important;
     transition: all 0.2s !important;
     text-align: left !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 section[data-testid="stSidebar"] .stButton > button:hover {
     border-color: #f97316 !important;
