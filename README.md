@@ -1,0 +1,1 @@
+# campusmind-ai
