@@ -168,8 +168,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     padding: 60px 20px;
     color: #475569;
 }
-.empty-state .icon { font-size: 3.5rem; margin-bottom: 16px; }
-.empty-state h2 { color: #94a3b8; font-size: 1.3rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; }
+.empty-state h2 { color: #94a3b8; font-size: 3.2rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -2px; line-height: 1.1; }
 .empty-state p  { font-size: 0.85rem; line-height: 1.7; }
 
 /* ── PDF banner ── */
@@ -193,14 +192,23 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 .chip span { color: #f97316; font-weight: 600; }
 
 /* ── Chat input ── */
+[data-testid="stChatInput"] {
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
 [data-testid="stChatInput"] > div {
     background: #1a1d27 !important;
     border: 1px solid #2d3148 !important;
     border-radius: 12px !important;
+    padding: 4px 10px !important;
 }
 [data-testid="stChatInputTextArea"] {
     color: #e2e8f0 !important;
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
+    min-height: 38px !important;
+    max-height: 120px !important;
 }
 [data-testid="stChatInput"] button {
     background: #f97316 !important;
@@ -428,7 +436,6 @@ if not st.session_state.messages:
         st.session_state.greeting = random.choice(_greetings)
     st.markdown(f"""
     <div class="empty-state">
-        <div class="icon">🎓</div>
         <h2>{st.session_state.greeting}</h2>
     </div>
     """, unsafe_allow_html=True)
