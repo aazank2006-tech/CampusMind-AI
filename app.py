@@ -325,68 +325,6 @@ with st.sidebar:
             "`GROQ_API_KEY = \"gsk_...\"`"
         )
 
-    # ── Model ─────────────────────────────────────────────────
-    st.markdown('<div class="sidebar-divider">🤖 Model</div>', unsafe_allow_html=True)
-    model_label = st.selectbox(
-        "Model",
-        options=list(AVAILABLE_MODELS.values()),
-        index=0,
-    )
-    selected_model_id = [k for k, v in AVAILABLE_MODELS.items() if v == model_label][0]
-    if st.session_state.bot and selected_model_id != st.session_state.selected_model:
-        st.session_state.selected_model = selected_model_id
-        st.session_state.bot.change_model(selected_model_id)
-
-    # ── PDF Upload ────────────────────────────────────────────
-    st.markdown('<div class="sidebar-divider">📄 PDF Upload</div>', unsafe_allow_html=True)
-    uploaded_pdf = st.file_uploader("Upload a PDF", type=["pdf"], label_visibility="collapsed")
-
-    if uploaded_pdf:
-        if uploaded_pdf.name != st.session_state.pdf_name:
-            with st.spinner("Reading PDF..."):
-                pdf_text = extract_pdf_text(uploaded_pdf)
-            if pdf_text and st.session_state.bot:
-                st.session_state.bot.set_pdf_context(pdf_text)
-                st.session_state.pdf_loaded = True
-                st.session_state.pdf_name = uploaded_pdf.name
-                st.success(f"📄 {uploaded_pdf.name} loaded!")
-    else:
-        if st.session_state.pdf_loaded and st.session_state.bot:
-            st.session_state.bot.clear_pdf_context()
-            st.session_state.pdf_loaded = False
-            st.session_state.pdf_name = ""
-
-    # ── Voice Input ───────────────────────────────────────────
-    st.markdown('<div class="sidebar-divider">🎙️ Voice Input</div>', unsafe_allow_html=True)
-    st.caption("Record your message — transcribed by Groq Whisper")
-
-    try:
-        from audio_recorder_streamlit import audio_recorder
-        audio_bytes = audio_recorder(
-            text="",
-            recording_color="#f97316",
-            neutral_color="#2d3148",
-            icon_size="2x",
-            pause_threshold=2.5,
-        )
-        if audio_bytes and len(audio_bytes) > 1000:
-            if st.session_state.bot and st.session_state.api_key_set:
-                with st.spinner("Transcribing..."):
-                    transcript = st.session_state.bot.transcribe_audio(audio_bytes)
-                if transcript:
-                    st.session_state.voice_text = transcript
-                    st.success(f"✅ Heard: *{transcript[:60]}...*" if len(transcript) > 60 else f"✅ Heard: *{transcript}*")
-                else:
-                    st.warning("Couldn't transcribe — try again.")
-            else:
-                st.warning("Enter API key first.")
-    except ImportError:
-        st.warning("Install `audio-recorder-streamlit` for voice input.")
-        st.code("pip install audio-recorder-streamlit", language="bash")
-
-    # ── Voice Output toggle ───────────────────────────────────
-    voice_output = st.toggle("🔊 Read replies aloud", value=False)
-
     # ── Memory viewer ─────────────────────────────────────────
     st.markdown('<div class="sidebar-divider">🧠 Memory</div>', unsafe_allow_html=True)
     if st.session_state.bot:
@@ -509,20 +447,218 @@ else:
                 unsafe_allow_html=True,
             )
 
-# ── Input row ────────────────────────────────────────────────
-# Pre-fill from voice if available
-voice_prefill = st.session_state.pop("voice_text", "") if "voice_text" in st.session_state else ""
+# ── Claude-style unified input bar ──────────────────────────
+# CSS: hide default file uploader ugliness, style everything into one bar
+st.markdown("""
+<style>
+/* ── Scroll padding so messages don't hide behind fixed bar ── */
+section.main > div { padding-bottom: 160px !important; }
 
+/* ── The unified input container ── */
+.input-box-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    z-index: 1000;
+    background: #0f1117;
+    padding: 12px 24px 16px;
+    border-top: 1px solid #1e2030;
+}
+.input-box-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #1a1d27;
+    border: 1px solid #2d3148;
+    border-radius: 16px;
+    padding: 10px 14px 8px;
+}
+/* Top row: pills */
+.input-top-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #252a3a;
+    border: 1px solid #2d3148;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    white-space: nowrap;
+}
+.pill:hover { border-color: #f97316; color: #f97316; }
+.pill.active { border-color: #f97316; color: #f97316; background: #2a1f0e; }
+
+/* Bottom row: icons */
+.input-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #252a3a;
+}
+.icon-btn {
+    background: none; border: none;
+    color: #64748b; font-size: 1.1rem;
+    cursor: pointer; padding: 4px 8px;
+    border-radius: 8px; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 4px;
+}
+.icon-btn:hover { color: #f97316; background: #252a3a; }
+.icon-btn.active { color: #f97316; }
+.icon-right { display: flex; align-items: center; gap: 6px; }
+.tts-label { font-size: 0.72rem; color: #64748b; }
+
+/* ── Override chat_input to blend into our box ── */
+[data-testid="stChatInput"] {
+    position: fixed !important;
+    bottom: 88px !important;
+    left: 0 !important; right: 0 !important;
+    z-index: 1001 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 24px !important;
+    max-width: 100% !important;
+}
+[data-testid="stChatInput"] > div {
+    max-width: 860px !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
+[data-testid="stChatInputTextArea"] {
+    background: transparent !important;
+    border: none !important;
+    color: #e2e8f0 !important;
+    font-size: 0.93rem !important;
+    padding: 4px 0 !important;
+    resize: none !important;
+    box-shadow: none !important;
+}
+[data-testid="stChatInputTextArea"]::placeholder { color: #475569 !important; }
+[data-testid="stChatInput"] button {
+    background: #f97316 !important;
+    border-radius: 8px !important;
+    border: none !important;
+}
+
+/* Hide file uploader default UI, show only what we render */
+[data-testid="stFileUploader"] {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+[data-testid="stFileUploader"] > div { display: none !important; }
+[data-testid="stFileUploader"] section { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
+
+# ── Hidden file uploader (triggered by paperclip pill click) ─
+# We render a real st.file_uploader but hide it with CSS;
+# showing a styled pill instead that triggers it via JS label click.
+uploaded_pdf = st.file_uploader(
+    "📎 Attach PDF", type=["pdf"],
+    label_visibility="visible", key="main_pdf"
+)
+if uploaded_pdf:
+    if uploaded_pdf.name != st.session_state.pdf_name:
+        with st.spinner("Reading PDF..."):
+            pdf_text = extract_pdf_text(uploaded_pdf)
+        if pdf_text and st.session_state.bot:
+            st.session_state.bot.set_pdf_context(pdf_text)
+            st.session_state.pdf_loaded = True
+            st.session_state.pdf_name = uploaded_pdf.name
+else:
+    if st.session_state.pdf_loaded and st.session_state.bot:
+        st.session_state.bot.clear_pdf_context()
+        st.session_state.pdf_loaded = False
+        st.session_state.pdf_name = ""
+
+# Current model label (short)
+_model_short = {
+    "llama-3.3-70b-versatile": "LLaMA 3.3 70B",
+    "llama-3.1-8b-instant":    "LLaMA 3.1 8B",
+    "mixtral-8x7b-32768":      "Mixtral 8x7B",
+}.get(st.session_state.selected_model, st.session_state.selected_model)
+
+# PDF pill label
+_pdf_pill = f"📄 {st.session_state.pdf_name[:18]}…" if st.session_state.pdf_loaded else "📄 No PDF"
+_pdf_class = "pill active" if st.session_state.pdf_loaded else "pill"
+
+# Render the unified bottom bar (visual only — real inputs are above/below)
+st.markdown(f"""
+<div class="input-box-wrapper">
+  <div class="input-box-inner">
+    <div class="input-top-row">
+      <span class="pill" onclick="document.querySelector('[data-testid=stFileUploader] input').click()">📎 Attach PDF</span>
+      <span class="{_pdf_class}">{_pdf_pill}</span>
+      <span class="pill">🤖 {_model_short}</span>
+    </div>
+    <!-- chat_input renders here via CSS positioning -->
+    <div style="min-height:36px"></div>
+    <div class="input-bottom-row">
+      <div style="display:flex;gap:4px;align-items:center">
+        <button class="icon-btn" onclick="document.querySelector('[data-testid=stFileUploader] input').click()" title="Attach PDF">📎</button>
+        <button class="icon-btn" id="mic-btn" title="Voice input">🎙️</button>
+      </div>
+      <div class="icon-right">
+        <span class="tts-label">Read aloud</span>
+      </div>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ── Model selector (hidden, controlled by pill click via JS ideally) ──
+# Rendered in sidebar for now but visually shown as pill above
+with st.sidebar:
+    st.markdown('<div class="sidebar-divider">🤖 Model</div>', unsafe_allow_html=True)
+    _ml = st.selectbox("Model", options=list(AVAILABLE_MODELS.values()),
+                        index=list(AVAILABLE_MODELS.keys()).index(st.session_state.selected_model),
+                        key="sidebar_model_sel")
+    _mid = [k for k, v in AVAILABLE_MODELS.items() if v == _ml][0]
+    if st.session_state.bot and _mid != st.session_state.selected_model:
+        st.session_state.selected_model = _mid
+        st.session_state.bot.change_model(_mid)
+
+# ── Voice (mic) ───────────────────────────────────────────────
+try:
+    from audio_recorder_streamlit import audio_recorder
+    _ab = audio_recorder(text="", recording_color="#f97316",
+                         neutral_color="#475569", icon_size="sm",
+                         pause_threshold=2.5, key="main_mic")
+    if _ab and len(_ab) > 1000 and st.session_state.bot:
+        with st.spinner("Transcribing..."):
+            _tr = st.session_state.bot.transcribe_audio(_ab)
+        if _tr:
+            st.session_state.voice_text = _tr
+except ImportError:
+    pass
+
+# ── TTS toggle ────────────────────────────────────────────────
+voice_output = st.toggle("🔊 Read replies aloud", value=False, key="main_tts")
+
+# ── Chat input ────────────────────────────────────────────────
 prompt = st.chat_input(
-    "Type your message… (or use 🎙️ voice in the sidebar)",
+    "Message CampusMind AI…",
     disabled=not st.session_state.api_key_set,
 )
 
-# Use voice transcript if no typed input
-final_input = prompt or (st.session_state.get("voice_text", "") if not prompt else "")
-
-# Clear voice_text after use
-if st.session_state.get("voice_text") and not prompt:
+final_input = prompt
+if not final_input and st.session_state.get("voice_text"):
     final_input = st.session_state.voice_text
     st.session_state.voice_text = ""
 
@@ -531,12 +667,9 @@ if final_input and st.session_state.bot:
     with st.spinner("CampusMind AI is thinking..."):
         reply = st.session_state.bot.chat(final_input)
     st.session_state.messages.append({"role": "assistant", "content": reply})
-
-    # TTS if enabled
     if voice_output:
-        with st.spinner("Generating voice response..."):
+        with st.spinner("Generating audio..."):
             audio = text_to_speech(reply)
             if audio:
                 st.session_state.tts_audio = audio
-
     st.rerun()
