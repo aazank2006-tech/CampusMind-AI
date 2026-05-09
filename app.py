@@ -31,21 +31,32 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid #2d3148 !important;
     min-width: 240px !important;
     max-width: 240px !important;
-    transition: all 0.3s ease !important;
+    transition: min-width 0.4s cubic-bezier(0.4,0,0.2,1),
+                max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+                transform  0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
 section[data-testid="stSidebar"][aria-expanded="false"] {
     min-width: 0px !important;
     max-width: 0px !important;
     overflow: hidden !important;
+    transform: translateX(-100%) !important;
 }
 section[data-testid="stSidebar"] > div {
     padding: 0.8rem !important;
+}
+/* Main area — smooth expand when sidebar hides */
+section.main {
+    transition: margin-left 0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
 .main .block-container {
     max-width: 100% !important;
     padding-left: 2rem !important;
     padding-right: 2rem !important;
-    transition: all 0.3s ease !important;
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+/* Stagger children so they reflow smoothly */
+.main .block-container > * {
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
 
 /* Sidebar labels */
@@ -193,7 +204,7 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 
 /* ── Chat input ── */
 [data-testid="stChatInput"] {
-    max-width: 680px !important;
+    max-width: 720px !important;
     margin: 0 auto !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -201,14 +212,16 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 [data-testid="stChatInput"] > div {
     background: #1a1d27 !important;
     border: 1px solid #2d3148 !important;
-    border-radius: 12px !important;
-    padding: 4px 10px !important;
+    border-radius: 10px !important;
+    padding: 1px 8px !important;
 }
 [data-testid="stChatInputTextArea"] {
     color: #e2e8f0 !important;
     font-size: 0.88rem !important;
-    min-height: 38px !important;
-    max-height: 120px !important;
+    min-height: 28px !important;
+    max-height: 90px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
 }
 [data-testid="stChatInput"] button {
     background: #f97316 !important;
