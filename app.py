@@ -1,6 +1,5 @@
 """
 app.py — CampusMind AI — Streamlit UI
-Redesigned to match clean sidebar layout with avatar bubbles and minimal input bar.
 """
 
 import os, json, io
@@ -26,18 +25,40 @@ body, .stApp {
     font-family: 'DM Sans', sans-serif !important;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar with smooth slide transition ── */
 section[data-testid="stSidebar"] {
     background: #13151d !important;
     border-right: 1px solid #1e2130 !important;
     min-width: 220px !important;
     max-width: 220px !important;
+    transition: min-width 0.3s cubic-bezier(0.4,0,0.2,1),
+                max-width 0.3s cubic-bezier(0.4,0,0.2,1),
+                border-color 0.3s ease !important;
+    overflow: hidden !important;
+}
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    min-width: 0px !important;
+    max-width: 0px !important;
+    border-right-color: transparent !important;
 }
 section[data-testid="stSidebar"] > div {
     padding: 1rem 0.75rem !important;
+    opacity: 1;
+    transition: opacity 0.2s ease !important;
+}
+section[data-testid="stSidebar"][aria-expanded="false"] > div {
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-/* Sidebar title */
+/* Main content transitions with sidebar */
+.main .block-container {
+    max-width: 100% !important;
+    padding: 1.5rem 2.5rem 90px !important;
+    transition: padding 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── Sidebar elements ── */
 .sb-title {
     display: flex;
     align-items: center;
@@ -50,8 +71,6 @@ section[data-testid="stSidebar"] > div {
     margin-bottom: 16px;
     letter-spacing: -0.2px;
 }
-
-/* Section labels */
 .sb-label {
     font-size: 0.65rem;
     font-weight: 700;
@@ -60,34 +79,18 @@ section[data-testid="stSidebar"] > div {
     color: #3d4260;
     margin: 18px 0 8px;
 }
-
-/* Status badge */
 .sb-status-ok {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #0d2218;
-    border: 1px solid #1a5c38;
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 0.78rem;
-    color: #4ade80;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+    background: #0d2218; border: 1px solid #1a5c38;
+    border-radius: 8px; padding: 7px 10px;
+    font-size: 0.78rem; color: #4ade80; font-weight: 600;
 }
 .sb-status-err {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #1f0d0d;
-    border: 1px solid #5c1a1a;
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 0.78rem;
-    color: #f87171;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+    background: #1f0d0d; border: 1px solid #5c1a1a;
+    border-radius: 8px; padding: 7px 10px;
+    font-size: 0.78rem; color: #f87171; font-weight: 600;
 }
-
-/* Sidebar selects */
 section[data-testid="stSidebar"] .stSelectbox > div > div {
     background: #0d0f14 !important;
     border: 1px solid #1e2130 !important;
@@ -102,8 +105,6 @@ section[data-testid="stSidebar"] label {
     letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
 }
-
-/* Sidebar buttons */
 section[data-testid="stSidebar"] .stButton > button {
     width: 100% !important;
     background: #0d0f14 !important;
@@ -123,8 +124,6 @@ section[data-testid="stSidebar"] .stButton > button:hover {
     color: #a5b0ff !important;
     background: #13152a !important;
 }
-
-/* File uploader in sidebar */
 section[data-testid="stSidebar"] [data-testid="stFileUploader"] {
     background: transparent !important;
 }
@@ -138,149 +137,89 @@ section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] p {
     color: #3d4260 !important;
     font-size: 0.75rem !important;
 }
-
-/* Voice section */
-.voice-card {
-    background: #0d0f14;
-    border: 1px solid #1e2130;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 0.75rem;
-    color: #3d4260;
-    text-align: center;
-    line-height: 1.5;
-}
-
-/* "Heard" badge */
-.heard-badge {
-    background: #0d2218;
-    border: 1px solid #1a5c38;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    color: #4ade80;
-    margin-top: 8px;
-}
-
-/* TTS toggle override */
-section[data-testid="stSidebar"] .stToggle {
-    margin-top: 4px !important;
-}
+section[data-testid="stSidebar"] .stToggle { margin-top: 4px !important; }
 section[data-testid="stSidebar"] .stToggle label {
-    font-size: 0.78rem !important;
-    color: #8891b4 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
+    font-size: 0.78rem !important; color: #8891b4 !important;
+    text-transform: none !important; letter-spacing: 0 !important;
     font-weight: 500 !important;
 }
+.mem-item { font-size: 0.78rem; color: #8891b4; padding: 2px 0; }
+.mem-item strong { color: #d4d8e8; }
 
-/* ── Main area ── */
-.main .block-container {
-    max-width: 820px !important;
-    margin: 0 auto !important;
-    padding: 1.5rem 1.5rem 180px !important;
-}
-
-/* Header */
+/* ── Header ── */
 .chat-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid #1e2130;
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 14px; border-bottom: 1px solid #1e2130;
     margin-bottom: 24px;
 }
 .chat-header h1 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #f1f3fa;
-    margin: 0;
-    letter-spacing: -0.3px;
+    font-size: 1.25rem; font-weight: 700;
+    color: #f1f3fa; margin: 0; letter-spacing: -0.3px;
 }
 
-/* Chat messages */
+/* ── Chat messages ── */
 .msg-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 20px;
+    display: flex; align-items: flex-start;
+    gap: 10px; margin-bottom: 20px;
 }
-.msg-row.user {
-    flex-direction: row-reverse;
-}
+.msg-row.user { flex-direction: row-reverse; }
 .avatar-wrap {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
 }
 .av-bot  { background: #1e2130; color: #d4d8e8; }
 .av-user { background: #3346c8; color: #fff; }
-
 .bubble {
-    max-width: 72%;
-    padding: 11px 15px;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    line-height: 1.65;
-    white-space: pre-wrap;
-    word-break: break-word;
+    max-width: 72%; padding: 11px 15px; border-radius: 12px;
+    font-size: 0.875rem; line-height: 1.65;
+    white-space: pre-wrap; word-break: break-word;
 }
 .bubble-bot {
-    background: #13151d;
-    border: 1px solid #1e2130;
-    border-radius: 4px 12px 12px 12px;
-    color: #d4d8e8;
+    background: #13151d; border: 1px solid #1e2130;
+    border-radius: 4px 12px 12px 12px; color: #d4d8e8;
 }
 .bubble-user {
-    background: #1e2f8a;
-    border: 1px solid #2d45c0;
-    border-radius: 12px 4px 12px 12px;
-    color: #e8ecff;
+    background: #1e2f8a; border: 1px solid #2d45c0;
+    border-radius: 12px 4px 12px 12px; color: #e8ecff;
 }
 
-/* Empty state */
+/* ── Empty state — icon + title only ── */
 .empty-wrap {
     text-align: center;
     padding: 80px 20px 40px;
 }
 .empty-wrap .icon { font-size: 3rem; margin-bottom: 14px; }
-.empty-wrap h2 { font-size: 1.15rem; color: #8891b4; margin-bottom: 8px; }
-.empty-wrap p  { font-size: 0.82rem; color: #3d4260; line-height: 1.8; }
+.empty-wrap h2 { font-size: 1.15rem; color: #8891b4; margin: 0; }
 
-/* PDF banner */
+/* ── PDF banner ── */
 .pdf-banner {
-    background: #0c1628;
-    border: 1px solid #1e3d70;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.8rem;
-    color: #7eb3ff;
-    margin-bottom: 18px;
+    background: #0c1628; border: 1px solid #1e3d70;
+    border-radius: 8px; padding: 8px 14px;
+    font-size: 0.8rem; color: #7eb3ff; margin-bottom: 18px;
 }
 
-/* ── Fixed input bar ── */
+/* ══════════════════════════════════════════════════
+   FULL-WIDTH FIXED INPUT BAR — left:0 to right:0
+   ══════════════════════════════════════════════════ */
 [data-testid="stChatInput"] {
     position: fixed !important;
     bottom: 0 !important;
-    left: 220px !important;
+    left: 0 !important;
     right: 0 !important;
     z-index: 999 !important;
     background: #0d0f14 !important;
     border-top: 1px solid #1e2130 !important;
-    padding: 14px 24px 16px !important;
+    padding: 12px 20px 14px !important;
+    margin: 0 !important;
 }
 [data-testid="stChatInput"] > div {
-    max-width: 820px !important;
-    margin: 0 auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     background: #13151d !important;
     border: 1px solid #1e2130 !important;
     border-radius: 12px !important;
+    box-shadow: none !important;
 }
 [data-testid="stChatInputTextArea"] {
     background: transparent !important;
@@ -289,25 +228,16 @@ section[data-testid="stSidebar"] .stToggle label {
     font-family: 'DM Sans', sans-serif !important;
     font-size: 0.88rem !important;
     box-shadow: none !important;
+    resize: none !important;
 }
 [data-testid="stChatInputTextArea"]::placeholder { color: #3d4260 !important; }
 [data-testid="stChatInput"] button {
     background: #3346c8 !important;
     border-radius: 8px !important;
     border: none !important;
-    margin-right: 4px !important;
+    transition: background 0.15s ease !important;
 }
-[data-testid="stChatInput"] button:hover {
-    background: #4558e0 !important;
-}
-
-/* Memory text */
-.mem-item {
-    font-size: 0.78rem;
-    color: #8891b4;
-    padding: 2px 0;
-}
-.mem-item strong { color: #d4d8e8; }
+[data-testid="stChatInput"] button:hover { background: #4558e0 !important; }
 
 footer { visibility: hidden; }
 #MainMenu { visibility: hidden; }
@@ -324,7 +254,6 @@ def init_state():
         "selected_model": list(AVAILABLE_MODELS.keys())[0],
         "pdf_loaded":     False,
         "pdf_name":       "",
-        "voice_text":     "",
         "tts_audio":      None,
     }
     for k, v in defaults.items():
@@ -426,28 +355,6 @@ with st.sidebar:
             st.session_state.pdf_loaded = False
             st.session_state.pdf_name   = ""
 
-    # ── Voice Input ───────────────────────────────────────────
-    st.markdown('<div class="sb-label">Voice Input</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="voice-card">Record your message —<br>transcribed by Groq Whisper</div>',
-        unsafe_allow_html=True,
-    )
-    try:
-        from audio_recorder_streamlit import audio_recorder
-        _ab = audio_recorder(
-            text="", recording_color="#3346c8",
-            neutral_color="#3d4260", icon_size="sm",
-            pause_threshold=2.5, key="main_mic",
-        )
-        if _ab and len(_ab) > 1000 and st.session_state.bot:
-            with st.spinner("Transcribing…"):
-                _tr = st.session_state.bot.transcribe_audio(_ab)
-            if _tr:
-                st.session_state.voice_text = _tr
-                st.markdown(f'<div class="heard-badge">✅ Heard: {_tr[:60]}</div>', unsafe_allow_html=True)
-    except ImportError:
-        st.caption("Install `audio-recorder-streamlit` for voice input.")
-
     # ── TTS ───────────────────────────────────────────────────
     voice_output = st.toggle("🔊 Read replies aloud", value=False, key="main_tts")
 
@@ -504,7 +411,6 @@ with st.sidebar:
 # MAIN CHAT AREA
 # ══════════════════════════════════════════════════════════════
 
-# Header
 st.markdown(
     '<div class="chat-header">'
     '<span style="font-size:1.6rem">🎓</span>'
@@ -513,29 +419,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# PDF banner
 if st.session_state.pdf_loaded:
     st.markdown(
         f'<div class="pdf-banner">📄 <strong>{st.session_state.pdf_name}</strong> loaded — ask me anything about it!</div>',
         unsafe_allow_html=True,
     )
 
-# TTS playback
 if st.session_state.tts_audio:
     st.audio(st.session_state.tts_audio, format="audio/mp3", autoplay=True)
     st.session_state.tts_audio = None
 
-# Messages
 if not st.session_state.messages:
     st.markdown("""
     <div class="empty-wrap">
         <div class="icon">🎓</div>
         <h2>Welcome to CampusMind AI</h2>
-        <p>
-            Your intelligent campus companion.<br>
-            I remember your name, major, and preferences across sessions.<br>
-            Upload a PDF · Use your voice · Ask me anything!
-        </p>
     </div>
     """, unsafe_allow_html=True)
 else:
@@ -560,19 +458,14 @@ else:
 
 # ── Chat Input ────────────────────────────────────────────────
 prompt = st.chat_input(
-    "Type your message… (or use 🎙 voice in the sidebar)",
+    "Type your message…",
     disabled=not st.session_state.api_key_set,
 )
 
-final_input = prompt
-if not final_input and st.session_state.get("voice_text"):
-    final_input = st.session_state.voice_text
-    st.session_state.voice_text = ""
-
-if final_input and st.session_state.bot:
-    st.session_state.messages.append({"role": "user", "content": final_input})
+if prompt and st.session_state.bot:
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.spinner("CampusMind AI is thinking…"):
-        reply = st.session_state.bot.chat(final_input)
+        reply = st.session_state.bot.chat(prompt)
     st.session_state.messages.append({"role": "assistant", "content": reply})
     if voice_output:
         with st.spinner("Generating audio…"):
