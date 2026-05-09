@@ -15,14 +15,14 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; }
 
 body, .stApp {
     background: #0d0f14 !important;
     color: #d4d8e8 !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Sora', sans-serif !important;
 }
 
 /* ── Sidebar with smooth slide transition ── */
@@ -112,7 +112,7 @@ section[data-testid="stSidebar"] .stButton > button {
     color: #8891b4 !important;
     border-radius: 8px !important;
     font-size: 0.78rem !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Sora', sans-serif !important;
     font-weight: 500 !important;
     padding: 0.45rem 0.75rem !important;
     margin-bottom: 4px !important;
@@ -153,8 +153,9 @@ section[data-testid="stSidebar"] .stToggle label {
     margin-bottom: 24px;
 }
 .chat-header h1 {
-    font-size: 1.25rem; font-weight: 700;
-    color: #f1f3fa; margin: 0; letter-spacing: -0.3px;
+    font-size: 1.3rem; font-weight: 800;
+    color: #f1f3fa; margin: 0; letter-spacing: -0.5px;
+    font-family: 'Sora', sans-serif;
 }
 
 /* ── Chat messages ── */
@@ -172,8 +173,9 @@ section[data-testid="stSidebar"] .stToggle label {
 .av-user { background: #3346c8; color: #fff; }
 .bubble {
     max-width: 72%; padding: 11px 15px; border-radius: 12px;
-    font-size: 0.875rem; line-height: 1.65;
+    font-size: 0.875rem; line-height: 1.7;
     white-space: pre-wrap; word-break: break-word;
+    font-family: 'Sora', sans-serif;
 }
 .bubble-bot {
     background: #13151d; border: 1px solid #1e2130;
@@ -190,7 +192,7 @@ section[data-testid="stSidebar"] .stToggle label {
     padding: 80px 20px 40px;
 }
 .empty-wrap .icon { font-size: 3rem; margin-bottom: 14px; }
-.empty-wrap h2 { font-size: 1.15rem; color: #8891b4; margin: 0; }
+.empty-wrap h2 { font-size: 1.2rem; color: #8891b4; margin: 0; font-weight: 700; font-family: 'Sora', sans-serif; letter-spacing: -0.3px; }
 
 /* ── PDF banner ── */
 .pdf-banner {
@@ -200,7 +202,7 @@ section[data-testid="stSidebar"] .stToggle label {
 }
 
 /* ══════════════════════════════════════════════════
-   FULL-WIDTH FIXED INPUT BAR — left:0 to right:0
+   FULL-WIDTH FIXED INPUT BAR — transitions with sidebar
    ══════════════════════════════════════════════════ */
 [data-testid="stChatInput"] {
     position: fixed !important;
@@ -212,32 +214,53 @@ section[data-testid="stSidebar"] .stToggle label {
     border-top: 1px solid #1e2130 !important;
     padding: 12px 20px 14px !important;
     margin: 0 !important;
+    transition: left 0.3s cubic-bezier(0.4,0,0.2,1),
+                width 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+}
+/* When sidebar is open, shift input bar right to stay aligned */
+section[data-testid="stSidebar"][aria-expanded="true"] ~ * [data-testid="stChatInput"],
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stChatInput"] {
+    left: 0 !important;
 }
 [data-testid="stChatInput"] > div {
     max-width: 100% !important;
     margin: 0 !important;
     background: #13151d !important;
-    border: 1px solid #1e2130 !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
+    border: 1px solid #252a3d !important;
+    border-radius: 14px !important;
+    box-shadow: 0 -2px 24px rgba(0,0,0,0.3) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+[data-testid="stChatInput"] > div:focus-within {
+    border-color: #3346c8 !important;
+    box-shadow: 0 0 0 3px rgba(51,70,200,0.15), 0 -2px 24px rgba(0,0,0,0.3) !important;
 }
 [data-testid="stChatInputTextArea"] {
     background: transparent !important;
     border: none !important;
     color: #d4d8e8 !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 0.88rem !important;
+    font-family: 'Sora', sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
     box-shadow: none !important;
     resize: none !important;
+    letter-spacing: -0.1px !important;
 }
-[data-testid="stChatInputTextArea"]::placeholder { color: #3d4260 !important; }
+[data-testid="stChatInputTextArea"]::placeholder {
+    color: #2e344f !important;
+    font-style: italic !important;
+    font-family: 'Sora', sans-serif !important;
+}
 [data-testid="stChatInput"] button {
     background: #3346c8 !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     border: none !important;
-    transition: background 0.15s ease !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
 }
-[data-testid="stChatInput"] button:hover { background: #4558e0 !important; }
+[data-testid="stChatInput"] button:hover {
+    background: #4558e0 !important;
+    transform: scale(1.05) !important;
+}
 
 footer { visibility: hidden; }
 #MainMenu { visibility: hidden; }
