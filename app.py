@@ -279,37 +279,35 @@ with st.sidebar:
     st.markdown("## 🎓 CampusMind AI")
     st.markdown("---")
 
-    # ── API Key ───────────────────────────────────────────────
-    st.markdown('<div class="sidebar-divider">🔑 API Key</div>', unsafe_allow_html=True)
-
-    env_key, secret_key = os.environ.get("GROQ_API_KEY", ""), ""
+    # ── API Key — loaded silently from secrets/env, never shown in UI ────────
+    _env_key = os.environ.get("GROQ_API_KEY", "")
+    _secret_key = ""
     try:
-        secret_key = st.secrets.get("GROQ_API_KEY", "")
+        _secret_key = st.secrets.get("GROQ_API_KEY", "")
     except Exception:
         pass
-    prefilled = env_key or secret_key
+    _api_key = _env_key or _secret_key
 
-    api_key_input = st.text_input(
-        "Groq API Key",
-        value=prefilled,
-        type="password",
-        placeholder="gsk_...",
-        help="Free key at console.groq.com",
-    )
-
-    if api_key_input:
+    if _api_key:
         if not st.session_state.api_key_set or st.session_state.bot is None:
             try:
                 st.session_state.bot = Chatbot(
-                    api_key=api_key_input,
+                    api_key=_api_key,
                     model=st.session_state.selected_model,
                 )
                 st.session_state.api_key_set = True
             except Exception as e:
-                st.error(f"Init failed: {e}")
-        st.success("✅ Connected to Groq")
+                st.error(f"Bot init failed: {e}")
+        st.success("✅ CampusMind AI is ready!")
     else:
-        st.info("Get your free key → [console.groq.com](https://console.groq.com)")
+        st.error(
+            "⚠️ API key not configured.\n\n"
+            "**For local use:** set environment variable\n"
+            "`export GROQ_API_KEY=gsk_...`\n\n"
+            "**For Streamlit Cloud:** go to\n"
+            "Settings → Secrets → add\n"
+            "`GROQ_API_KEY = \"gsk_...\"`"
+        )
 
     # ── Model ─────────────────────────────────────────────────
     st.markdown('<div class="sidebar-divider">🤖 Model</div>', unsafe_allow_html=True)
@@ -442,15 +440,11 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Header
-mem_facts = st.session_state.bot.memory.get_all() if st.session_state.bot else {}
-mem_label = f'<span class="memory-badge">🧠 Remembers {len(mem_facts)} facts</span>' if mem_facts else ""
 st.markdown(
-    f'<div class="main-header">'
-    f'<span style="font-size:2rem">🎓</span>'
-    f'<h1>CampusMind AI</h1>'
-    f'<span class="badge">Powered by Groq</span>'
-    f'{mem_label}'
-    f'</div>',
+    '<div class="main-header">'
+    '<span style="font-size:2rem">🎓</span>'
+    '<h1>CampusMind AI</h1>'
+    '</div>',
     unsafe_allow_html=True,
 )
 
