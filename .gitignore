@@ -1,7 +1,9 @@
 # Secrets — NEVER commit
 .streamlit/secrets.toml
 .env
-*.env
+
+# Memory file (user-specific, don't share)
+campusmind_memory.json
 
 # Python
 __pycache__/
@@ -10,7 +12,6 @@ __pycache__/
 venv/
 
 # Exports
-conversation.json
 *.json
 
 # OS

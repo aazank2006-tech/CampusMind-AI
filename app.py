@@ -1,14 +1,14 @@
 """
-app.py — CampusMind AI — Streamlit front-end powered by Groq.
-Run locally:  streamlit run app.py
-Deploy:       push to GitHub → connect at share.streamlit.io
+app.py — CampusMind AI — Streamlit UI
+Features: PDF upload, voice input/output, persistent memory, fixed sidebar.
+Run: streamlit run app.py
 """
 
-import json
+import os, json, io
 import streamlit as st
-from chatbot import Chatbot, AVAILABLE_MODELS, DEFAULT_SYSTEM_PROMPT
+from chatbot import Chatbot, AVAILABLE_MODELS, BASE_SYSTEM_PROMPT
 
-# ── Page config (must be first Streamlit call) ────────────────────────────────
+# ── Must be FIRST Streamlit call ──────────────────────────────────────────────
 st.set_page_config(
     page_title="CampusMind AI",
     page_icon="🎓",
@@ -16,58 +16,114 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Custom CSS ────────────────────────────────────────────────────────────────
+# ── CSS — clean, sidebar-safe dark theme ──────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Root theme */
-:root {
-    --bg:        #0d0f14;
-    --surface:   #161920;
-    --border:    #252a35;
-    --accent:    #f97316;
-    --accent2:   #fb923c;
-    --text:      #e8eaf0;
-    --muted:     #6b7280;
-    --user-bg:   #1a1f2e;
-    --bot-bg:    #111318;
-    --radius:    12px;
+/* ── Base ── */
+body, .stApp {
+    background-color: #0f1117 !important;
+    color: #e2e8f0 !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
-/* Global */
-html, body, [data-testid="stAppViewContainer"] {
-    background: var(--bg) !important;
-    color: var(--text) !important;
-    font-family: 'DM Mono', monospace !important;
+/* ── Sidebar ── */
+section[data-testid="stSidebar"] {
+    background-color: #1a1d27 !important;
+    border-right: 1px solid #2d3148 !important;
+    min-width: 280px !important;
+}
+section[data-testid="stSidebar"] > div {
+    padding: 1rem !important;
 }
 
-[data-testid="stSidebar"] {
-    background: var(--surface) !important;
-    border-right: 1px solid var(--border) !important;
+/* ── Sidebar text inputs ── */
+section[data-testid="stSidebar"] input,
+section[data-testid="stSidebar"] textarea {
+    background-color: #0f1117 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2d3148 !important;
+    border-radius: 8px !important;
 }
 
-/* Header */
-.chat-header {
+/* ── Sidebar select boxes ── */
+section[data-testid="stSidebar"] .stSelectbox > div > div {
+    background-color: #0f1117 !important;
+    border: 1px solid #2d3148 !important;
+    color: #e2e8f0 !important;
+    border-radius: 8px !important;
+}
+
+/* ── Sidebar labels ── */
+section[data-testid="stSidebar"] label {
+    color: #94a3b8 !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* ── Sidebar buttons ── */
+section[data-testid="stSidebar"] .stButton > button {
+    width: 100% !important;
+    background: #0f1117 !important;
+    border: 1px solid #2d3148 !important;
+    color: #94a3b8 !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+    padding: 0.4rem 0.8rem !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s !important;
+    text-align: left !important;
+}
+section[data-testid="stSidebar"] .stButton > button:hover {
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+    background: #1a1d27 !important;
+}
+
+/* ── Dividers ── */
+.sidebar-divider {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #475569;
+    margin: 16px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #2d3148;
+}
+
+/* ── Main area ── */
+.main-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 20px 0 8px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
+    padding: 8px 0 16px;
+    border-bottom: 1px solid #2d3148;
+    margin-bottom: 20px;
 }
-.chat-header h1 {
-    font-family: 'Syne', sans-serif !important;
-    font-weight: 800;
-    font-size: 1.8rem;
-    color: var(--text);
+.main-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f1f5f9;
     margin: 0;
-    letter-spacing: -0.5px;
 }
-.chat-header .badge {
-    background: var(--accent);
+.badge {
+    background: #f97316;
     color: #000;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.memory-badge {
+    background: #1e40af;
+    color: #bfdbfe;
+    font-size: 0.6rem;
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 20px;
@@ -75,188 +131,162 @@ html, body, [data-testid="stAppViewContainer"] {
     text-transform: uppercase;
 }
 
-/* Messages */
-.message-row {
+/* ── Chat messages ── */
+.msg-user {
     display: flex;
-    gap: 14px;
-    margin-bottom: 20px;
-    animation: fadeUp 0.25s ease;
+    justify-content: flex-end;
+    margin-bottom: 14px;
 }
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.message-row.user { flex-direction: row-reverse; }
-
-.avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+.msg-bot {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
+    justify-content: flex-start;
+    margin-bottom: 14px;
 }
-.avatar.user-av  { background: var(--accent);  color: #000; }
-.avatar.bot-av   { background: var(--border);  color: var(--text); }
-
-.bubble {
-    max-width: 72%;
-    padding: 14px 18px;
-    border-radius: var(--radius);
-    line-height: 1.65;
+.bubble-user {
+    background: #1e3a5f;
+    border: 1px solid #2563eb;
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 16px 16px 4px 16px;
+    max-width: 70%;
     font-size: 0.9rem;
+    line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
 }
-.bubble.user-bubble {
-    background: var(--user-bg);
-    border: 1px solid var(--accent);
-    color: var(--text);
-    border-top-right-radius: 2px;
+.bubble-bot {
+    background: #1a1d27;
+    border: 1px solid #2d3148;
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 16px 16px 16px 4px;
+    max-width: 70%;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
-.bubble.bot-bubble {
-    background: var(--bot-bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-top-left-radius: 2px;
+.avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; font-weight: 700;
+    flex-shrink: 0; margin-top: 2px;
 }
+.av-user { background: #f97316; color: #000; }
+.av-bot  { background: #2d3148; color: #e2e8f0; }
 
-/* Input area */
-.stChatInput > div {
-    border: 1px solid var(--border) !important;
-    background: var(--surface) !important;
-    border-radius: var(--radius) !important;
-}
-.stChatInput textarea {
-    color: var(--text) !important;
-    font-family: 'DM Mono', monospace !important;
-    font-size: 0.88rem !important;
-}
-
-/* Sidebar elements */
-.stSelectbox label, .stTextArea label, .stSlider label {
-    font-family: 'Syne', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase !important;
-    color: var(--muted) !important;
-}
-.stSelectbox > div > div,
-.stTextArea textarea {
-    background: var(--bg) !important;
-    border: 1px solid var(--border) !important;
-    color: var(--text) !important;
-    font-family: 'DM Mono', monospace !important;
-    font-size: 0.85rem !important;
-    border-radius: 8px !important;
-}
-
-/* Buttons */
-.stButton > button {
-    background: transparent !important;
-    border: 1px solid var(--border) !important;
-    color: var(--muted) !important;
-    font-family: 'DM Mono', monospace !important;
-    font-size: 0.8rem !important;
-    border-radius: 8px !important;
-    transition: all 0.2s !important;
-    width: 100%;
-}
-.stButton > button:hover {
-    border-color: var(--accent) !important;
-    color: var(--accent) !important;
-}
-
-/* Stats chips */
-.stats-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 12px 0;
-}
-.stat-chip {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-}
-.stat-chip span { color: var(--accent); font-weight: 600; }
-
-/* Empty state */
+/* ── Empty state ── */
 .empty-state {
     text-align: center;
-    padding: 80px 20px;
-    color: var(--muted);
+    padding: 60px 20px;
+    color: #475569;
 }
-.empty-state .big-icon { font-size: 3rem; margin-bottom: 16px; }
-.empty-state h3 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--text);
-    margin-bottom: 8px;
-}
-.empty-state p { font-size: 0.85rem; line-height: 1.6; }
+.empty-state .icon { font-size: 3.5rem; margin-bottom: 16px; }
+.empty-state h2 { color: #94a3b8; font-size: 1.3rem; margin-bottom: 8px; }
+.empty-state p  { font-size: 0.85rem; line-height: 1.7; }
 
-/* Sidebar section headers */
-.sidebar-section {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 20px 0 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
+/* ── Info chips ── */
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.chip {
+    background: #1a1d27; border: 1px solid #2d3148;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 0.7rem; color: #64748b;
+}
+.chip span { color: #f97316; font-weight: 600; }
+
+/* ── Voice indicator ── */
+.voice-hint {
+    font-size: 0.75rem; color: #64748b;
+    text-align: center; margin-top: 4px;
 }
 
-/* Hide streamlit branding */
-#MainMenu, footer, header { visibility: hidden; }
+/* ── PDF banner ── */
+.pdf-banner {
+    background: #0f2027;
+    border: 1px solid #1e40af;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    color: #93c5fd;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Hide Streamlit footer only ── */
+footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── Session state init ────────────────────────────────────────────────────────
+# ── Session state ─────────────────────────────────────────────────────────────
 def init_state():
-    if "messages" not in st.session_state:
-        st.session_state.messages = []          # [{role, content}]
-    if "bot" not in st.session_state:
-        st.session_state.bot = None
-    if "api_key_set" not in st.session_state:
-        st.session_state.api_key_set = False
-    if "system_prompt" not in st.session_state:
-        st.session_state.system_prompt = DEFAULT_SYSTEM_PROMPT
-    if "selected_model" not in st.session_state:
-        st.session_state.selected_model = list(AVAILABLE_MODELS.keys())[0]
+    defaults = {
+        "messages":       [],
+        "bot":            None,
+        "api_key_set":    False,
+        "selected_model": list(AVAILABLE_MODELS.keys())[0],
+        "pdf_loaded":     False,
+        "pdf_name":       "",
+        "voice_text":     "",
+        "tts_audio":      None,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
 init_state()
 
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── Helper: text-to-speech ────────────────────────────────────────────────────
+def text_to_speech(text: str) -> bytes:
+    """Convert text to audio bytes using gTTS."""
+    try:
+        from gtts import gTTS
+        buf = io.BytesIO()
+        tts = gTTS(text=text[:500], lang="en", slow=False)
+        tts.write_to_fp(buf)
+        buf.seek(0)
+        return buf.read()
+    except Exception as e:
+        st.warning(f"TTS error: {e}")
+        return b""
+
+
+# ── Helper: PDF extraction ────────────────────────────────────────────────────
+def extract_pdf_text(uploaded_file) -> str:
+    try:
+        import pdfplumber
+        text_parts = []
+        with pdfplumber.open(uploaded_file) as pdf:
+            for page in pdf.pages:
+                t = page.extract_text()
+                if t:
+                    text_parts.append(t)
+        return "\n\n".join(text_parts)
+    except Exception as e:
+        st.error(f"PDF read error: {e}")
+        return ""
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SIDEBAR
+# ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown('<div class="chat-header"><h1>🎓 CampusMind AI</h1></div>', unsafe_allow_html=True)
 
-    # API key input
-    st.markdown('<div class="sidebar-section">API Key</div>', unsafe_allow_html=True)
+    st.markdown("## 🎓 CampusMind AI")
+    st.markdown("---")
 
-    # Check Streamlit secrets first (for deployment), then env var
-    import os
-    env_key = os.environ.get("GROQ_API_KEY", "")
-    secret_key = ""
+    # ── API Key ───────────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🔑 API Key</div>', unsafe_allow_html=True)
+
+    env_key, secret_key = os.environ.get("GROQ_API_KEY", ""), ""
     try:
         secret_key = st.secrets.get("GROQ_API_KEY", "")
     except Exception:
         pass
-
     prefilled = env_key or secret_key
 
     api_key_input = st.text_input(
@@ -264,8 +294,7 @@ with st.sidebar:
         value=prefilled,
         type="password",
         placeholder="gsk_...",
-        label_visibility="collapsed",
-        help="Get your free key at console.groq.com",
+        help="Free key at console.groq.com",
     )
 
     if api_key_input:
@@ -273,65 +302,114 @@ with st.sidebar:
             try:
                 st.session_state.bot = Chatbot(
                     api_key=api_key_input,
-                    system_prompt=st.session_state.system_prompt,
                     model=st.session_state.selected_model,
                 )
                 st.session_state.api_key_set = True
             except Exception as e:
-                st.error(f"Failed to init: {e}")
-        st.success("✓ Connected", icon="⚡")
+                st.error(f"Init failed: {e}")
+        st.success("✅ Connected to Groq")
     else:
-        st.info("Enter your Groq API key to start. Free at [console.groq.com](https://console.groq.com)")
+        st.info("Get your free key → [console.groq.com](https://console.groq.com)")
 
-    # Model selector
-    st.markdown('<div class="sidebar-section">Model</div>', unsafe_allow_html=True)
+    # ── Model ─────────────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🤖 Model</div>', unsafe_allow_html=True)
     model_label = st.selectbox(
         "Model",
         options=list(AVAILABLE_MODELS.values()),
         index=0,
-        label_visibility="collapsed",
     )
-    # Map label back to model ID
     selected_model_id = [k for k, v in AVAILABLE_MODELS.items() if v == model_label][0]
     if st.session_state.bot and selected_model_id != st.session_state.selected_model:
         st.session_state.selected_model = selected_model_id
         st.session_state.bot.change_model(selected_model_id)
 
-    # System prompt
-    st.markdown('<div class="sidebar-section">Persona</div>', unsafe_allow_html=True)
-    new_prompt = st.text_area(
-        "System prompt",
-        value=st.session_state.system_prompt,
-        height=130,
-        label_visibility="collapsed",
-        placeholder="You are a helpful assistant...",
-    )
-    if new_prompt != st.session_state.system_prompt:
-        st.session_state.system_prompt = new_prompt
-        if st.session_state.bot:
-            st.session_state.bot.change_system_prompt(new_prompt)
+    # ── PDF Upload ────────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">📄 PDF Upload</div>', unsafe_allow_html=True)
+    uploaded_pdf = st.file_uploader("Upload a PDF", type=["pdf"], label_visibility="collapsed")
 
-    # Quick personas
-    st.markdown('<div class="sidebar-section">Quick Personas</div>', unsafe_allow_html=True)
-    personas = {
-        "🤖 Default Assistant":  DEFAULT_SYSTEM_PROMPT,
-        "🐍 Python Tutor":       "You are an expert Python tutor. Only answer Python/coding questions. Give short code examples with every answer.",
-        "✍️ Writing Coach":      "You are a professional writing coach. Help improve clarity, grammar, and style. Be encouraging but direct.",
-        "📊 Data Analyst":       "You are a data analyst. Help with data, statistics, SQL, and visualization. Use concrete examples.",
-        "🏴‍☠️ Pirate":           "You are a swashbuckling pirate. Answer every question in pirate speak. Arrr!",
-    }
-    for label, prompt in personas.items():
-        if st.button(label, key=f"persona_{label}"):
-            st.session_state.system_prompt = prompt
-            if st.session_state.bot:
-                st.session_state.bot.change_system_prompt(prompt)
+    if uploaded_pdf:
+        if uploaded_pdf.name != st.session_state.pdf_name:
+            with st.spinner("Reading PDF..."):
+                pdf_text = extract_pdf_text(uploaded_pdf)
+            if pdf_text and st.session_state.bot:
+                st.session_state.bot.set_pdf_context(pdf_text)
+                st.session_state.pdf_loaded = True
+                st.session_state.pdf_name = uploaded_pdf.name
+                st.success(f"📄 {uploaded_pdf.name} loaded!")
+    else:
+        if st.session_state.pdf_loaded and st.session_state.bot:
+            st.session_state.bot.clear_pdf_context()
+            st.session_state.pdf_loaded = False
+            st.session_state.pdf_name = ""
+
+    # ── Voice Input ───────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🎙️ Voice Input</div>', unsafe_allow_html=True)
+    st.caption("Record your message — transcribed by Groq Whisper")
+
+    try:
+        from audio_recorder_streamlit import audio_recorder
+        audio_bytes = audio_recorder(
+            text="",
+            recording_color="#f97316",
+            neutral_color="#2d3148",
+            icon_size="2x",
+            pause_threshold=2.5,
+        )
+        if audio_bytes and len(audio_bytes) > 1000:
+            if st.session_state.bot and st.session_state.api_key_set:
+                with st.spinner("Transcribing..."):
+                    transcript = st.session_state.bot.transcribe_audio(audio_bytes)
+                if transcript:
+                    st.session_state.voice_text = transcript
+                    st.success(f"✅ Heard: *{transcript[:60]}...*" if len(transcript) > 60 else f"✅ Heard: *{transcript}*")
+                else:
+                    st.warning("Couldn't transcribe — try again.")
+            else:
+                st.warning("Enter API key first.")
+    except ImportError:
+        st.warning("Install `audio-recorder-streamlit` for voice input.")
+        st.code("pip install audio-recorder-streamlit", language="bash")
+
+    # ── Voice Output toggle ───────────────────────────────────
+    voice_output = st.toggle("🔊 Read replies aloud", value=False)
+
+    # ── Memory viewer ─────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🧠 Memory</div>', unsafe_allow_html=True)
+    if st.session_state.bot:
+        facts = st.session_state.bot.memory.get_all()
+        if facts:
+            for k, v in facts.items():
+                st.markdown(f"**{k.title()}:** {v}")
+        else:
+            st.caption("Nothing remembered yet. Tell me your name!")
+
+        if st.button("🗑️ Clear Memory"):
+            st.session_state.bot.memory.clear()
             st.rerun()
 
-    # Controls
-    st.markdown('<div class="sidebar-section">Controls</div>', unsafe_allow_html=True)
+    # ── Personas ──────────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🎭 Personas</div>', unsafe_allow_html=True)
+    personas = {
+        "🎓 Campus Assistant": BASE_SYSTEM_PROMPT,
+        "🐍 Python Tutor":     "You are CampusMind AI acting as a Python tutor. Only answer coding questions. Give short code examples.",
+        "✍️ Writing Coach":    "You are CampusMind AI acting as a writing coach. Help with clarity, grammar, and style.",
+        "📊 Study Planner":    "You are CampusMind AI acting as a study planner. Help with schedules, time management, and exam prep.",
+        "🌍 Research Helper":  "You are CampusMind AI acting as a research assistant. Help find sources, summarize topics, and structure essays.",
+    }
+    for label, prompt in personas.items():
+        if st.button(label):
+            if st.session_state.bot:
+                # Patch just the base; memory block is added automatically
+                from chatbot import BASE_SYSTEM_PROMPT as _base
+                import chatbot as _cm
+                _cm.BASE_SYSTEM_PROMPT = prompt
+                st.rerun()
+
+    # ── Controls ──────────────────────────────────────────────
+    st.markdown('<div class="sidebar-divider">⚙️ Controls</div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🗑 Clear chat"):
+        if st.button("🗑 Clear Chat"):
             st.session_state.messages = []
             if st.session_state.bot:
                 st.session_state.bot.reset()
@@ -339,80 +417,116 @@ with st.sidebar:
     with col2:
         if st.button("💾 Export"):
             if st.session_state.messages:
-                export = json.dumps(st.session_state.messages, indent=2)
-                st.download_button(
-                    "⬇ Download JSON",
-                    data=export,
-                    file_name="conversation.json",
-                    mime="application/json",
-                )
+                data = json.dumps(st.session_state.messages, indent=2)
+                st.download_button("⬇ JSON", data=data,
+                                   file_name="campusmind_chat.json",
+                                   mime="application/json")
             else:
-                st.warning("No messages to export.")
+                st.warning("No messages yet.")
 
     # Stats
     if st.session_state.messages:
         turns = len(st.session_state.messages) // 2
         words = sum(len(m["content"].split()) for m in st.session_state.messages)
         st.markdown(
-            f'<div class="stats-row">'
-            f'<div class="stat-chip">turns <span>{turns}</span></div>'
-            f'<div class="stat-chip">words <span>{words}</span></div>'
+            f'<div class="chip-row">'
+            f'<div class="chip">Turns <span>{turns}</span></div>'
+            f'<div class="chip">Words <span>{words}</span></div>'
             f'</div>',
             unsafe_allow_html=True,
         )
 
 
-# ── Main chat area ────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# MAIN CHAT AREA
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Header
+mem_facts = st.session_state.bot.memory.get_all() if st.session_state.bot else {}
+mem_label = f'<span class="memory-badge">🧠 Remembers {len(mem_facts)} facts</span>' if mem_facts else ""
 st.markdown(
-    '<div class="chat-header">'
-    '<h1>CampusMind AI</h1>'
-    '<span class="badge">Free & Fast</span>'
-    '</div>',
+    f'<div class="main-header">'
+    f'<span style="font-size:2rem">🎓</span>'
+    f'<h1>CampusMind AI</h1>'
+    f'<span class="badge">Powered by Groq</span>'
+    f'{mem_label}'
+    f'</div>',
     unsafe_allow_html=True,
 )
 
-# Message display
-chat_container = st.container()
-with chat_container:
-    if not st.session_state.messages:
-        st.markdown("""
-        <div class="empty-state">
-            <div class="big-icon">🎓</div>
-            <h3>Welcome to CampusMind AI</h3>
-            <p>Blazing fast inference — free tier available.<br>
-            Enter your API key in the sidebar to begin.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        for msg in st.session_state.messages:
-            is_user = msg["role"] == "user"
-            row_class   = "user" if is_user else "bot"
-            av_class    = "user-av" if is_user else "bot-av"
-            bub_class   = "user-bubble" if is_user else "bot-bubble"
-            avatar_icon = "U" if is_user else "⚡"
+# PDF context banner
+if st.session_state.pdf_loaded:
+    st.markdown(
+        f'<div class="pdf-banner">📄 <strong>{st.session_state.pdf_name}</strong> is loaded — ask me anything about it!</div>',
+        unsafe_allow_html=True,
+    )
 
+# TTS audio playback (shown above chat if available)
+if st.session_state.tts_audio:
+    st.audio(st.session_state.tts_audio, format="audio/mp3", autoplay=True)
+    st.session_state.tts_audio = None
+
+# Messages
+if not st.session_state.messages:
+    st.markdown("""
+    <div class="empty-state">
+        <div class="icon">🎓</div>
+        <h2>Welcome to CampusMind AI</h2>
+        <p>
+            Your intelligent campus companion.<br>
+            I remember your name, major, and preferences across sessions.<br>
+            Upload a PDF 📄 · Use your voice 🎙️ · Ask me anything!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    for msg in st.session_state.messages:
+        is_user = msg["role"] == "user"
+        if is_user:
             st.markdown(
-                f'<div class="message-row {row_class}">'
-                f'  <div class="avatar {av_class}">{avatar_icon}</div>'
-                f'  <div class="bubble {bub_class}">{msg["content"]}</div>'
+                f'<div class="msg-user">'
+                f'<div class="bubble-user">{msg["content"]}</div>'
+                f'<div class="avatar av-user" style="margin-left:8px">U</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f'<div class="msg-bot">'
+                f'<div class="avatar av-bot" style="margin-right:8px">🎓</div>'
+                f'<div class="bubble-bot">{msg["content"]}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
 
-# Chat input (always shown at bottom)
-if prompt := st.chat_input(
-    "Message the chatbot...",
+# ── Input row ────────────────────────────────────────────────
+# Pre-fill from voice if available
+voice_prefill = st.session_state.pop("voice_text", "") if "voice_text" in st.session_state else ""
+
+prompt = st.chat_input(
+    "Type your message… (or use 🎙️ voice in the sidebar)",
     disabled=not st.session_state.api_key_set,
-):
-    if not st.session_state.bot:
-        st.error("Please enter your API key in the sidebar first.")
-    else:
-        # Add user message
-        st.session_state.messages.append({"role": "user", "content": prompt})
+)
 
-        # Get bot reply
-        with st.spinner(""):
-            reply = st.session_state.bot.chat(prompt)
+# Use voice transcript if no typed input
+final_input = prompt or (st.session_state.get("voice_text", "") if not prompt else "")
 
-        st.session_state.messages.append({"role": "assistant", "content": reply})
-        st.rerun()
+# Clear voice_text after use
+if st.session_state.get("voice_text") and not prompt:
+    final_input = st.session_state.voice_text
+    st.session_state.voice_text = ""
+
+if final_input and st.session_state.bot:
+    st.session_state.messages.append({"role": "user", "content": final_input})
+    with st.spinner("CampusMind AI is thinking..."):
+        reply = st.session_state.bot.chat(final_input)
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+
+    # TTS if enabled
+    if voice_output:
+        with st.spinner("Generating voice response..."):
+            audio = text_to_speech(reply)
+            if audio:
+                st.session_state.tts_audio = audio
+
+    st.rerun()
