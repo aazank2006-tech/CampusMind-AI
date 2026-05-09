@@ -12,6 +12,22 @@ import base64
 import tempfile
 import streamlit as st
 from chatbot import Chatbot, AVAILABLE_MODELS, DEFAULT_SYSTEM_PROMPT
+from audio_recorder_streamlit import audio_recorder
+
+st.title("CampusMind AI")
+
+# Add audio recorder
+audio_bytes = audio_recorder(
+    text="Click to record",
+    recording_color="#e74c3c",
+    neutral_color="#d3d3d3",
+    icon_name="microphone",
+    icon_size="2x",
+)
+
+if audio_bytes:
+    st.audio(audio_bytes, format="audio/wav")
+    st.success("Audio recorded successfully!")
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
