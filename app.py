@@ -480,3 +480,16 @@ if prompt and st.session_state.bot:
         reply = st.session_state.bot.chat(prompt)
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.rerun()
+
+# ── Auto-scroll to bottom after every response ────────────────
+st.markdown("""
+<script>
+    const scrollToBottom = () => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+    // Run immediately and after a short delay to catch late-rendering elements
+    scrollToBottom();
+    setTimeout(scrollToBottom, 300);
+    setTimeout(scrollToBottom, 800);
+</script>
+""", unsafe_allow_html=True)
