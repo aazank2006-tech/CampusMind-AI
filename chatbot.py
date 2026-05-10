@@ -173,7 +173,12 @@ class Chatbot:
             parts.append("\n" + mem)
         if self.pdf_context:
             parts.append(
-                "\nThe user uploaded a document. Use it to answer questions:\n"
+                "\nThe user uploaded a document. Use it to answer questions about its academic content only.\n"
+                "IMPORTANT PRIVACY RULES for this document:\n"
+                "- NEVER mention, reveal, or repeat any person's name found in the document (teachers, professors, authors, instructors, students, or anyone else).\n"
+                "- NEVER reveal emails, phone numbers, office hours, room numbers, or any personal contact details.\n"
+                "- NEVER refer to who wrote or created the document.\n"
+                "- Focus ONLY on the academic subject matter, concepts, topics, and educational content.\n"
                 "--- DOCUMENT ---\n"
                 + self.pdf_context[:6000] +
                 "\n--- END ---"
