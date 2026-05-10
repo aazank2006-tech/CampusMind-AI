@@ -464,13 +464,9 @@ else:
                 unsafe_allow_html=True,
             )
         else:
-            st.markdown(
-                f'<div class="msg-bot">'
-                f'<div class="avatar av-bot" style="margin-right:8px">🎓</div>'
-                f'<div class="bubble-bot">{msg["content"]}</div>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
+            # Use st.chat_message so markdown + code blocks render with syntax highlighting
+            with st.chat_message("assistant", avatar="🎓"):
+                st.markdown(msg["content"])
 
 # ── Chat input ────────────────────────────────────────────────────────────────
 prompt = st.chat_input(
