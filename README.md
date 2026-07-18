@@ -1,3 +1,4 @@
+<img width="1917" height="860" alt="chat-view" src="https://github.com/user-attachments/assets/4667aaf8-1203-4aaa-b548-e0f95861b83e" />
 # 🎓 CampusMind AI
 
 **A multi-persona AI study companion for university students — built with Streamlit and the Groq API.**
@@ -166,14 +167,17 @@ IMPORTANT PRIVACY RULES for this document:
 **Main chat view** — the empty-state screen with the randomized greeting and message input.
 
 ![Main chat view](screenshots/chat-view.png)
+<img width="1917" height="860" alt="chat-view" src="https://github.com/user-attachments/assets/b9ad64bb-c496-4c05-a44e-8d8a5d08216c" />
+)
 
 **Memory + persona recall in action** — the sidebar shows the live session ID, model picker, PDF uploader, and remembered facts (`Name: Aazan Khan`), while the chat itself shows the model recalling that name mid-conversation.
 
-![Sidebar memory and persona recall](screenshots/sidebar-memory.png)
+![Sidebar memory and persona recall](screenshots/sidebar-memory.png)<img width="1916" height="846" alt="sidebar-memory" src="https://github.com/user-attachments/assets/b7d21496-56db-4dd9-b859-2fce8af12283" />
+
 
 **PDF-grounded Q&A** — a lecture PDF (`PF Lecture 16 Palindrome Function (Ex 6-5).pdf`) is loaded, and the assistant answers a question about it directly from the document, including reproducing the relevant C++ function.
 
-![PDF question and answer](screenshots/pdf-qa.png)
+![PDF question and answer](screenshots/pdf-qa.png)<img width="1917" height="905" alt="pdf-qa" src="https://github.com/user-attachments/assets/4f19026b-be56-4633-a896-14a753e9e700" />
 
 ---
 
