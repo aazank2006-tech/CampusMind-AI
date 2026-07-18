@@ -1,6 +1,7 @@
 """
 chatbot.py — CampusMind AI core (Groq-powered).
-Features: multi-turn chat, persistent memory, PDF context, Whisper voice transcription, personas.
+Features: multi-turn chat, persistent memory (local file or Firestore),
+PDF context, Whisper voice transcription, personas.
 """
 
 import os, json, re, logging, tempfile
@@ -42,14 +43,23 @@ CODE FORMATTING RULES — follow these strictly every time you write code:
 # PERSISTENT MEMORY
 # ══════════════════════════════════════════════════════════════
 class Memory:
-    """Stores key user facts in a local JSON file across sessions."""
+    """
+    Stores key user facts. Backed by Firestore when a `store` is supplied
+    (survives restarts/redeploys); falls back to a local JSON file otherwise
+    (survives refreshes but not redeploys on ephemeral hosts).
+    """
 
-    def __init__(self, filepath: str = MEMORY_FILE):
+    def __init__(self, store=None, filepath: str = MEMORY_FILE, initial_facts: Optional[dict] = None):
+        self.store = store
         self.filepath = filepath
         self.facts: dict = {}
-        self.load()
+        if initial_facts is not None:
+            self.facts = dict(initial_facts)
+        elif not store:
+            self.load()
 
     def load(self):
+        """Local-file load only. Firestore-backed instances are seeded via initial_facts instead."""
         try:
             with open(self.filepath) as f:
                 self.facts = json.load(f)
@@ -57,6 +67,13 @@ class Memory:
             self.facts = {}
 
     def save(self):
+        """
+        Local-file mode: write immediately.
+        Firestore mode: no-op here — Chatbot persists memory + history together
+        in one document write after each turn, via Chatbot._persist().
+        """
+        if self.store:
+            return
         with open(self.filepath, "w") as f:
             json.dump(self.facts, f, indent=2)
 
@@ -123,6 +140,8 @@ class Memory:
 
     def clear(self):
         self.facts = {}
+        if self.store:
+            return  # Chatbot.clear_memory() handles the Firestore-side delete
         try: os.remove(self.filepath)
         except FileNotFoundError: pass
 
@@ -134,8 +153,8 @@ class Memory:
 # CONVERSATION HISTORY
 # ══════════════════════════════════════════════════════════════
 class ConversationHistory:
-    def __init__(self, max_turns: int = MAX_HISTORY_TURNS):
-        self.messages: list[dict] = []
+    def __init__(self, max_turns: int = MAX_HISTORY_TURNS, initial_messages: Optional[list] = None):
+        self.messages: list[dict] = list(initial_messages) if initial_messages else []
         self.max_turns = max_turns
 
     def add_user(self, text: str):
@@ -162,16 +181,34 @@ class ConversationHistory:
 # ══════════════════════════════════════════════════════════════
 class Chatbot:
     def __init__(self, api_key: Optional[str] = None,
-                 model: str = DEFAULT_MODEL, max_tokens: int = DEFAULT_MAX_TOKENS):
+                 model: str = DEFAULT_MODEL, max_tokens: int = DEFAULT_MAX_TOKENS,
+                 user_id: Optional[str] = None):
         key = api_key or os.environ.get("GROQ_API_KEY")
         if not key:
             raise ValueError("No API key. Set GROQ_API_KEY env var or pass api_key=.")
         self.client      = Groq(api_key=key)
         self.model       = model
         self.max_tokens  = max_tokens
-        self.history     = ConversationHistory()
-        self.memory      = Memory()
         self.pdf_context = ""
+
+        # ── Firestore-backed persistence (optional) ─────────────
+        self.user_id = user_id
+        self.store = None
+        if user_id:
+            try:
+                from firestore_store import FirestoreStore
+                self.store = FirestoreStore(user_id)
+            except Exception as e:
+                logger.error("Could not initialize Firestore store: %s", e)
+                self.store = None
+
+        if self.store and self.store.available:
+            saved = self.store.load()
+            self.memory  = Memory(store=self.store, initial_facts=saved.get("memory", {}))
+            self.history = ConversationHistory(initial_messages=saved.get("messages", []))
+        else:
+            self.memory  = Memory()
+            self.history = ConversationHistory()
 
         # Persona state lives on the instance (per Streamlit session), NOT as a
         # module-level global — a shared global would leak one user's persona
@@ -179,7 +216,21 @@ class Chatbot:
         self.persona_name   = "🎓 Campus Assistant"
         self.persona_prompt: Optional[str] = None   # None = use BASE_SYSTEM_PROMPT
 
-        logger.info("CampusMind AI ready — model: %s", self.model)
+        logger.info("CampusMind AI ready — model: %s, persisted: %s", self.model, bool(self.store))
+
+    # ── Persistence ──────────────────────────────────────────────
+    def _persist(self):
+        """Write memory + history together as one Firestore document, if enabled."""
+        if self.store and self.store.available:
+            self.store.save(self.memory.facts, self.history.messages)
+
+    def clear_memory(self):
+        self.memory.clear()
+        self._persist()
+
+    def clear_history_and_persist(self):
+        self.history.clear()
+        self._persist()
 
     # ── System prompt builder ──────────────────────────────────
     def _system_prompt(self) -> str:
@@ -220,6 +271,7 @@ class Chatbot:
             )
             reply = resp.choices[0].message.content
             self.history.add_assistant(reply)
+            self._persist()
             return reply
         except RateLimitError:
             self.history.messages.pop()
@@ -265,10 +317,12 @@ class Chatbot:
         self.persona_prompt = prompt
         if reset_history:
             self.history.clear()
+            self._persist()
 
     # ── Misc ───────────────────────────────────────────────────
     def reset(self):
         self.history.clear()
+        self._persist()
 
     def change_model(self, model: str):
         self.model = model

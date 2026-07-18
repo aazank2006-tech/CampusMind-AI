@@ -21,11 +21,12 @@ A campus-focused conversational assistant built with **Streamlit** and the **Gro
 
 ```
 campusmind-ai/
-├── app.py              # Streamlit interface
-├── chatbot.py           # Core chatbot logic (Groq client, memory, personas, PDF context)
-├── requirements.txt      # Python dependencies
+├── app.py                # Streamlit interface
+├── chatbot.py             # Core chatbot logic (Groq client, memory, personas, PDF context)
+├── firestore_store.py      # Firestore persistence layer (memory + chat history)
+├── requirements.txt        # Python dependencies
 ├── .streamlit/
-│   └── secrets.toml       # Local secrets template (not committed)
+│   └── secrets.toml           # Local secrets template (not committed)
 └── README.md
 ```
 
@@ -43,6 +44,7 @@ streamlit>=1.35
 groq>=0.9
 pdfplumber>=0.11
 gTTS>=2.5
+firebase-admin>=6.5
 ```
 
 ---
@@ -83,6 +85,52 @@ The app opens at `http://localhost:8501`.
 
 ---
 
+## 🔥 Persistent Memory with Firestore
+
+By default, memory and chat history reset whenever the app restarts (see
+**Notes on Persistence** below). To make them survive redeploys, connect a
+Firebase Firestore database.
+
+**1. Create a Firebase project**
+Go to [console.firebase.google.com](https://console.firebase.google.com) → **Add project**. Then enable **Firestore Database** (Build → Firestore Database → Create database, start in production mode).
+
+**2. Create a service account key**
+Project settings → **Service accounts** → **Generate new private key**. This downloads a JSON file — keep it secret, never commit it.
+
+**3. Add it to Streamlit secrets**
+Open the downloaded JSON and copy its fields into `.streamlit/secrets.toml` (locally) or the **Secrets** panel (Streamlit Cloud) under a `[firebase]` table:
+
+```toml
+GROQ_API_KEY = "gsk_your_key_here"
+
+[firebase]
+type = "service_account"
+project_id = "your-project-id"
+private_key_id = "..."
+private_key = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+client_email = "firebase-adminsdk-...@your-project-id.iam.gserviceaccount.com"
+client_id = "..."
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "..."
+universe_domain = "googleapis.com"
+```
+
+> The `private_key` must keep its `\n` line breaks exactly as in the downloaded JSON — TOML needs them written as literal `\n` inside the quoted string, not real newlines.
+
+**4. Install the dependency and run**
+```bash
+pip install firebase-admin
+streamlit run app.py
+```
+
+**How it works:** there's no login system. Instead, each visit gets a random session ID appended to the URL (`?uid=...`) the first time the app loads. That ID is the Firestore document key for that person's memory + chat history. **Bookmark or save the URL with the `uid` in it** to return to the same data later — a fresh URL means fresh (empty) memory. The sidebar's **🔗 Session** section shows the current ID and confirms whether Firestore is actually connected (it falls back to session-only memory automatically if secrets aren't configured, so the app still runs without Firebase set up).
+
+If you'd rather have real accounts instead of a bookmarkable link (so memory follows a person across devices without needing the URL), the next step up is adding **Firebase Authentication** — let me know if you want that wired in too.
+
+---
+
 ## ☁️ Deploying to Streamlit Community Cloud
 
 1. Push this repo to GitHub.
@@ -112,7 +160,7 @@ The app opens at `http://localhost:8501`.
 ## ⚠️ Notes on Persistence
 
 - **Conversation history** lives in `st.session_state` — it resets when the browser tab is refreshed or the session ends.
-- **Memory** (name, major, etc.) is written to a local JSON file (`campusmind_memory.json`), so it survives a refresh within the same running app instance — but on Streamlit Community Cloud the filesystem is ephemeral, so it resets on redeploys or app restarts. For durable cross-restart memory, swap the `Memory` class's file I/O for a real database.
+- **Memory** (name, major, etc.) and **chat history** are written to Firestore when `[firebase]` secrets are configured (see **Persistent Memory with Firestore** above) — this survives redeploys and restarts, keyed to the `uid` in the page URL. Without Firestore configured, memory falls back to a local JSON file (`campusmind_memory.json`) that survives a refresh but resets on redeploys, since Streamlit Community Cloud's filesystem is ephemeral.
 - **Personas** are stored on the `Chatbot` instance inside `st.session_state`, so they're isolated per user session and won't leak between visitors.
 
 ---

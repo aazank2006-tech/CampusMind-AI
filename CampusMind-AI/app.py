@@ -3,7 +3,7 @@ app.py — CampusMind AI — Streamlit UI
 Run: streamlit run app.py
 """
 
-import os, json, io
+import os, json, io, uuid
 import streamlit as st
 from chatbot import Chatbot, AVAILABLE_MODELS, BASE_SYSTEM_PROMPT
 
@@ -216,6 +216,18 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     margin-bottom: 16px;
 }
 
+/* ── Session banner ── */
+.session-box {
+    background: #0f1117;
+    border: 1px solid #2d3148;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    color: #64748b;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
 /* ── Chips ── */
 .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
 .chip {
@@ -282,6 +294,19 @@ def extract_pdf_text(uploaded_file) -> str:
         st.error(f"PDF read error: {e}")
         return ""
 
+def get_or_create_session_id() -> str:
+    """
+    Reads a `uid` query param from the URL, or generates one and writes it
+    back so the URL becomes a durable link the user can bookmark/save to
+    return to the same Firestore-backed memory and chat history later.
+    """
+    qp = st.query_params
+    if "uid" in qp and qp["uid"]:
+        return qp["uid"]
+    new_id = uuid.uuid4().hex[:12]
+    st.query_params["uid"] = new_id
+    return new_id
+
 
 # ── Persona definitions ─────────────────────────────────────────────────────
 PERSONAS = {
@@ -303,13 +328,18 @@ def init_state():
         "pdf_loaded":       False,
         "pdf_name":         "",
         "tts_audio":        None,
-        "current_persona":  "🎓 Campus Assistant",   # ← tracks active persona for this session
+        "current_persona":  "🎓 Campus Assistant",
+        "session_id":       None,
+        "history_restored": False,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
 init_state()
+
+if st.session_state.session_id is None:
+    st.session_state.session_id = get_or_create_session_id()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -334,8 +364,14 @@ with st.sidebar:
                 st.session_state.bot = Chatbot(
                     api_key=_api_key,
                     model=st.session_state.selected_model,
+                    user_id=st.session_state.session_id,   # ← enables Firestore persistence
                 )
                 st.session_state.api_key_set = True
+
+                # Pull any previously saved chat into the UI on first load
+                if not st.session_state.history_restored:
+                    st.session_state.messages = list(st.session_state.bot.history.messages)
+                    st.session_state.history_restored = True
             except Exception as e:
                 st.error(f"Bot init failed: {e}")
         st.success("✅ CampusMind AI is ready!")
@@ -345,6 +381,14 @@ with st.sidebar:
             "**Local:** `export GROQ_API_KEY=gsk_...`\n\n"
             "**Cloud:** Settings → Secrets → `GROQ_API_KEY = \"gsk_...\"`"
         )
+
+    # ── Session / persistence ────────────────────────────────
+    st.markdown('<div class="sidebar-divider">🔗 Session</div>', unsafe_allow_html=True)
+    if st.session_state.bot and st.session_state.bot.store and st.session_state.bot.store.available:
+        st.caption("Memory & chat persist to Firestore. Bookmark this page's URL to return to them later.")
+    else:
+        st.caption("Firestore not configured — memory/chat will reset on restart. See README.")
+    st.markdown(f'<div class="session-box">ID: {st.session_state.session_id}</div>', unsafe_allow_html=True)
 
     # ── Model ─────────────────────────────────────────────────
     st.markdown('<div class="sidebar-divider">🤖 Model</div>', unsafe_allow_html=True)
@@ -388,14 +432,13 @@ with st.sidebar:
         else:
             st.caption("Nothing remembered yet. Tell me your name!")
         if st.button("🗑️ Clear Memory"):
-            st.session_state.bot.memory.clear()
+            st.session_state.bot.clear_memory()
             st.rerun()
 
     # ── Personas ──────────────────────────────────────────────
     # NOTE: persona choice is stored on `st.session_state.bot` (an instance
     # attribute), NOT a module-level global. A shared global would leak one
-    # user's persona into every other session sharing the same server process
-    # — which was the root cause of the buttons "not working."
+    # user's persona into every other session sharing the same server process.
     st.markdown('<div class="sidebar-divider">🎭 Personas</div>', unsafe_allow_html=True)
     for label, prompt in PERSONAS.items():
         is_active = st.session_state.current_persona == label
@@ -522,7 +565,7 @@ prompt = st.chat_input(
 if prompt and st.session_state.bot:
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.spinner("CampusMind AI is thinking..."):
-        reply = st.session_state.bot.chat(prompt)
+        reply = st.session_state.bot.chat(prompt)   # also persists to Firestore internally
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.rerun()
 
