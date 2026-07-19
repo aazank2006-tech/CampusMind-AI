@@ -14,10 +14,338 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── CSS ───────────────────────────────────────────────────────────────────────
-st.markdown("""
+# ── Theme toggle (☀️ Light / 🌙 Dark) ───────────────────────────────────────
+st.sidebar.markdown("## 🎓 CampusMind AI")
+st.sidebar.markdown("---")
+is_light_mode = st.sidebar.toggle("☀️ Light Mode", value=False, key="is_light_mode")
+st.sidebar.markdown("")
+
+DARK_THEME_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+:root, body { color-scheme: dark; }
+
+body, .stApp {
+    background-color: #0f1117 !important;
+    color: #e2e8f0 !important;
+    font-family: 'DM Mono', monospace !important;
+}
+
+/* ── Sidebar ── */
+section[data-testid="stSidebar"] {
+    background-color: #1a1d27 !important;
+    border-right: 1px solid #2d3148 !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    transition: min-width 0.4s cubic-bezier(0.4,0,0.2,1),
+                max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+                transform  0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    min-width: 0px !important;
+    max-width: 0px !important;
+    overflow: hidden !important;
+    transform: translateX(-100%) !important;
+}
+section[data-testid="stSidebar"] > div {
+    padding: 0.8rem !important;
+}
+/* Main area — smooth expand when sidebar hides */
+section.main {
+    transition: margin-left 0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.main .block-container {
+    max-width: 100% !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+/* Stagger children so they reflow smoothly */
+.main .block-container > * {
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* Sidebar labels */
+section[data-testid="stSidebar"] label {
+    color: #94a3b8 !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+section[data-testid="stSidebar"] input,
+section[data-testid="stSidebar"] textarea {
+    background-color: #0f1117 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2d3148 !important;
+    border-radius: 8px !important;
+}
+section[data-testid="stSidebar"] .stSelectbox > div > div {
+    background-color: #0f1117 !important;
+    border: 1px solid #2d3148 !important;
+    color: #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+}
+section[data-testid="stSidebar"] .stButton > button {
+    width: 100% !important;
+    background: #0f1117 !important;
+    border: 1px solid #2d3148 !important;
+    color: #94a3b8 !important;
+    border-radius: 8px !important;
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.7rem !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s !important;
+    text-align: left !important;
+}
+section[data-testid="stSidebar"] .stButton > button:hover {
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+}
+/* Active persona (Streamlit "primary" button type) */
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    background: #f97316 !important;
+    border-color: #f97316 !important;
+    color: #0f1117 !important;
+    font-weight: 700 !important;
+}
+section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    background: #fb923c !important;
+    border-color: #fb923c !important;
+    color: #0f1117 !important;
+}
+
+/* Sidebar section dividers */
+.sidebar-divider {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #475569;
+    margin: 14px 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #2d3148;
+}
+
+/* ── Main area ── */
+.main-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 16px;
+    border-bottom: 1px solid #2d3148;
+    margin-bottom: 20px;
+}
+.main-header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    margin: 0;
+    font-family: 'Syne', sans-serif !important;
+    letter-spacing: -0.5px;
+}
+
+/* ── Chat messages ── */
+.msg-user {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+.msg-bot {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 14px;
+}
+.bubble-user {
+    background: #1e3a5f;
+    border: 1px solid #2563eb;
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 16px 16px 4px 16px;
+    max-width: 70%;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.bubble-bot {
+    background: #1a1d27;
+    border: 1px solid #2d3148;
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 16px 16px 16px 4px;
+    max-width: 70%;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; font-weight: 700;
+    flex-shrink: 0; margin-top: 2px;
+}
+.av-user { background: #f97316; color: #000; }
+.av-bot  { background: #2d3148; color: #e2e8f0; }
+
+/* ── Empty state ── */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #475569;
+}
+.empty-state h2 { color: #94a3b8; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+.empty-state p  { font-size: 0.85rem; line-height: 1.7; }
+
+/* ── PDF banner ── */
+.pdf-banner {
+    background: #0f2027;
+    border: 1px solid #1e40af;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    color: #93c5fd;
+    margin-bottom: 16px;
+}
+
+/* ── Persona banner ── */
+.persona-banner {
+    background: #1f1508;
+    border: 1px solid #92400e;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    color: #fdba74;
+    margin-bottom: 16px;
+}
+
+/* ── Session banner ── */
+.session-box {
+    background: #0f1117;
+    border: 1px solid #2d3148;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    color: #64748b;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+/* ── Chips ── */
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.chip {
+    background: #0f1117; border: 1px solid #2d3148;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 0.7rem; color: #64748b;
+}
+.chip span { color: #f97316; font-weight: 600; }
+
+/* ── Chat input ── */
+[data-testid="stChatInput"] {
+    max-width: 720px !important;
+    margin: 0 auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+[data-testid="stChatInput"] > div {
+    background: #1a1d27 !important;
+    border: 1px solid #2d3148 !important;
+    border-radius: 10px !important;
+    padding: 1px 8px !important;
+}
+[data-testid="stChatInputTextArea"] {
+    color: #e2e8f0 !important;
+    font-size: 0.88rem !important;
+    min-height: 28px !important;
+    max-height: 90px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+[data-testid="stChatInput"] button {
+    background: #f97316 !important;
+    border-radius: 8px !important;
+}
+
+footer { visibility: hidden; }
+
+/* ── Force dark mode on native Streamlit chrome ──────────────────────────── */
+/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) */
+header[data-testid="stHeader"] {
+    background-color: #0f1117 !important;
+}
+/* Thin gradient "decoration" bar Streamlit shows at the very top */
+div[data-testid="stDecoration"] {
+    background-image: none !important;
+    background-color: #0f1117 !important;
+}
+[data-testid="stToolbar"] {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+[data-testid="stToolbar"] svg {
+    fill: #94a3b8 !important;
+}
+
+/* Fixed bottom bar that wraps the chat input — not a descendant of .stApp,
+   so it needs its own override or it falls back to the browser/OS theme */
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"] {
+    background-color: #0f1117 !important;
+}
+
+/* File uploader — untouched by earlier CSS, so it rendered in Streamlit's
+   default light widget style */
+[data-testid="stFileUploader"] section,
+[data-testid="stFileUploaderDropzone"] {
+    background-color: #0f1117 !important;
+    border: 1px dashed #2d3148 !important;
+    border-radius: 8px !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] * {
+    color: #64748b !important;
+    fill: #64748b !important;
+}
+[data-testid="stFileUploader"] button {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2d3148 !important;
+    border-radius: 6px !important;
+}
+[data-testid="stFileUploaderFile"] {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Selectbox / dropdown popovers render outside .stApp, so they need
+   their own override to avoid a white flash when opened */
+div[data-baseweb="popover"],
+div[data-baseweb="menu"],
+ul[role="listbox"] {
+    background-color: #1a1d27 !important;
+    border: 1px solid #2d3148 !important;
+}
+ul[role="listbox"] li,
+div[data-baseweb="menu"] li {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+}
+ul[role="listbox"] li:hover {
+    background-color: #0f1117 !important;
+    color: #f97316 !important;
+}
+
+</style>
+"""
+
+LIGHT_THEME_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+:root, body { color-scheme: light; }
 
 body, .stApp {
     background-color: #ffffff !important;
@@ -284,6 +612,14 @@ div[data-testid="stDecoration"] {
     fill: #475569 !important;
 }
 
+/* Fixed bottom bar that wraps the chat input — not a descendant of .stApp,
+   so it needs its own override or it falls back to the browser/OS theme
+   (this was the black strip you saw behind the chat box) */
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"] {
+    background-color: #ffffff !important;
+}
+
 /* File uploader */
 [data-testid="stFileUploader"] section,
 [data-testid="stFileUploaderDropzone"] {
@@ -325,7 +661,10 @@ ul[role="listbox"] li:hover {
 }
 
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(LIGHT_THEME_CSS if is_light_mode else DARK_THEME_CSS, unsafe_allow_html=True)
+
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -406,9 +745,6 @@ if st.session_state.session_id is None:
 # SIDEBAR
 # ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("## 🎓 CampusMind AI")
-    st.markdown("---")
-
     # ── API Key (silent — from env or secrets) ────────────────
     _env_key = os.environ.get("GROQ_API_KEY", "")
     _secret_key = ""
