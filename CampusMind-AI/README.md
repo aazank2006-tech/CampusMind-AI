@@ -149,7 +149,7 @@ IMPORTANT PRIVACY RULES for this document:
 |---|---|---|
 | UI / frontend | **Streamlit** | Chat interface, sidebar controls, session state |
 | LLM inference | **Groq API** | Ultra-fast hosted inference for chat and persona behavior |
-| AI models |`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768` | Quality / speed / long-context tradeoffs, user-selectable |
+| AI models | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768` | Quality / speed / long-context tradeoffs, user-selectable |
 | Fact extraction | **Python `re` (regex)** | Rule-based, non-AI extraction of name/major/year/university from user messages |
 | Speech-to-text | **Groq Whisper (`whisper-large-v3`)** | Audio transcription (backend implemented, not yet wired to a mic widget) |
 | Text-to-speech | **gTTS** (Google Text-to-Speech) | Voice output (backend implemented, not yet wired to UI) |

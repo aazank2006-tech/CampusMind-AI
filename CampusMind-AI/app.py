@@ -264,6 +264,66 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 }
 
 footer { visibility: hidden; }
+
+/* ── Force dark mode on native Streamlit chrome ──────────────────────────── */
+/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) */
+header[data-testid="stHeader"] {
+    background-color: #0f1117 !important;
+}
+/* Thin gradient "decoration" bar Streamlit shows at the very top */
+div[data-testid="stDecoration"] {
+    background-image: none !important;
+    background-color: #0f1117 !important;
+}
+[data-testid="stToolbar"] {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+[data-testid="stToolbar"] svg {
+    fill: #94a3b8 !important;
+}
+
+/* File uploader — untouched by earlier CSS, so it rendered in Streamlit's
+   default light widget style */
+[data-testid="stFileUploader"] section,
+[data-testid="stFileUploaderDropzone"] {
+    background-color: #0f1117 !important;
+    border: 1px dashed #2d3148 !important;
+    border-radius: 8px !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] * {
+    color: #64748b !important;
+    fill: #64748b !important;
+}
+[data-testid="stFileUploader"] button {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2d3148 !important;
+    border-radius: 6px !important;
+}
+[data-testid="stFileUploaderFile"] {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Selectbox / dropdown popovers render outside .stApp, so they need
+   their own override to avoid a white flash when opened */
+div[data-baseweb="popover"],
+div[data-baseweb="menu"],
+ul[role="listbox"] {
+    background-color: #1a1d27 !important;
+    border: 1px solid #2d3148 !important;
+}
+ul[role="listbox"] li,
+div[data-baseweb="menu"] li {
+    background-color: #1a1d27 !important;
+    color: #e2e8f0 !important;
+}
+ul[role="listbox"] li:hover {
+    background-color: #0f1117 !important;
+    color: #f97316 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
