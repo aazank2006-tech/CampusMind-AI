@@ -20,15 +20,15 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
 
 body, .stApp {
-    background-color: #0f1117 !important;
-    color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
     font-family: 'DM Mono', monospace !important;
 }
 
 /* ── Sidebar ── */
 section[data-testid="stSidebar"] {
-    background-color: #1a1d27 !important;
-    border-right: 1px solid #2d3148 !important;
+    background-color: #f8fafc !important;
+    border-right: 1px solid #e2e8f0 !important;
     min-width: 240px !important;
     max-width: 240px !important;
     transition: min-width 0.4s cubic-bezier(0.4,0,0.2,1),
@@ -61,7 +61,7 @@ section.main {
 
 /* Sidebar labels */
 section[data-testid="stSidebar"] label {
-    color: #94a3b8 !important;
+    color: #64748b !important;
     font-size: 0.78rem !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
@@ -69,23 +69,23 @@ section[data-testid="stSidebar"] label {
 }
 section[data-testid="stSidebar"] input,
 section[data-testid="stSidebar"] textarea {
-    background-color: #0f1117 !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #2d3148 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
 }
 section[data-testid="stSidebar"] .stSelectbox > div > div {
-    background-color: #0f1117 !important;
-    border: 1px solid #2d3148 !important;
-    color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
     border-radius: 8px !important;
     font-size: 0.82rem !important;
 }
 section[data-testid="stSidebar"] .stButton > button {
     width: 100% !important;
-    background: #0f1117 !important;
-    border: 1px solid #2d3148 !important;
-    color: #94a3b8 !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
     border-radius: 8px !important;
     font-size: 0.8rem !important;
     padding: 0.35rem 0.7rem !important;
@@ -94,20 +94,20 @@ section[data-testid="stSidebar"] .stButton > button {
     text-align: left !important;
 }
 section[data-testid="stSidebar"] .stButton > button:hover {
-    border-color: #f97316 !important;
-    color: #f97316 !important;
+    border-color: #ea580c !important;
+    color: #ea580c !important;
 }
 /* Active persona (Streamlit "primary" button type) */
 section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
     background: #f97316 !important;
     border-color: #f97316 !important;
-    color: #0f1117 !important;
+    color: #1e293b !important;
     font-weight: 700 !important;
 }
 section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     background: #fb923c !important;
     border-color: #fb923c !important;
-    color: #0f1117 !important;
+    color: #1e293b !important;
 }
 
 /* Sidebar section dividers */
@@ -116,10 +116,10 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #475569;
+    color: #334155;
     margin: 14px 0 8px;
     padding-bottom: 5px;
-    border-bottom: 1px solid #2d3148;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 /* ── Main area ── */
@@ -128,13 +128,13 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     align-items: center;
     gap: 12px;
     padding: 8px 0 16px;
-    border-bottom: 1px solid #2d3148;
+    border-bottom: 1px solid #e2e8f0;
     margin-bottom: 20px;
 }
 .main-header h1 {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #0f172a;
     margin: 0;
     font-family: 'Syne', sans-serif !important;
     letter-spacing: -0.5px;
@@ -152,9 +152,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     margin-bottom: 14px;
 }
 .bubble-user {
-    background: #1e3a5f;
+    background: #eff6ff;
     border: 1px solid #2563eb;
-    color: #e2e8f0;
+    color: #1e3a5f;
     padding: 12px 16px;
     border-radius: 16px 16px 4px 16px;
     max-width: 70%;
@@ -164,9 +164,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     word-break: break-word;
 }
 .bubble-bot {
-    background: #1a1d27;
-    border: 1px solid #2d3148;
-    color: #e2e8f0;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
     padding: 12px 16px;
     border-radius: 16px 16px 16px 4px;
     max-width: 70%;
@@ -183,7 +183,7 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     flex-shrink: 0; margin-top: 2px;
 }
 .av-user { background: #f97316; color: #000; }
-.av-bot  { background: #2d3148; color: #e2e8f0; }
+.av-bot  { background: #e2e8f0; color: #334155; }
 
 /* ── Empty state ── */
 .empty-state {
@@ -191,39 +191,39 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     padding: 60px 20px;
     color: #475569;
 }
-.empty-state h2 { color: #94a3b8; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+.empty-state h2 { color: #334155; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
 .empty-state p  { font-size: 0.85rem; line-height: 1.7; }
 
 /* ── PDF banner ── */
 .pdf-banner {
-    background: #0f2027;
-    border: 1px solid #1e40af;
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #93c5fd;
+    color: #1d4ed8;
     margin-bottom: 16px;
 }
 
 /* ── Persona banner ── */
 .persona-banner {
-    background: #1f1508;
-    border: 1px solid #92400e;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #fdba74;
+    color: #c2410c;
     margin-bottom: 16px;
 }
 
 /* ── Session banner ── */
 .session-box {
-    background: #0f1117;
-    border: 1px solid #2d3148;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 0.72rem;
-    color: #64748b;
+    color: #475569;
     word-break: break-all;
     margin-bottom: 8px;
 }
@@ -231,11 +231,11 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 /* ── Chips ── */
 .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
 .chip {
-    background: #0f1117; border: 1px solid #2d3148;
+    background: #f1f5f9; border: 1px solid #e2e8f0;
     border-radius: 20px; padding: 3px 10px;
-    font-size: 0.7rem; color: #64748b;
+    font-size: 0.7rem; color: #475569;
 }
-.chip span { color: #f97316; font-weight: 600; }
+.chip span { color: #c2410c; font-weight: 600; }
 
 /* ── Chat input ── */
 [data-testid="stChatInput"] {
@@ -245,13 +245,14 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     padding-right: 0 !important;
 }
 [data-testid="stChatInput"] > div {
-    background: #1a1d27 !important;
-    border: 1px solid #2d3148 !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 10px !important;
     padding: 1px 8px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
 }
 [data-testid="stChatInputTextArea"] {
-    color: #e2e8f0 !important;
+    color: #1e293b !important;
     font-size: 0.88rem !important;
     min-height: 28px !important;
     max-height: 90px !important;
@@ -259,69 +260,68 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     padding-bottom: 6px !important;
 }
 [data-testid="stChatInput"] button {
-    background: #f97316 !important;
+    background: #ea580c !important;
     border-radius: 8px !important;
 }
 
 footer { visibility: hidden; }
 
-/* ── Force dark mode on native Streamlit chrome ──────────────────────────── */
+/* ── Force light mode on native Streamlit chrome ─────────────────────────── */
 /* Top header bar (behind Share/star/edit icons on Streamlit Cloud) */
 header[data-testid="stHeader"] {
-    background-color: #0f1117 !important;
+    background-color: #ffffff !important;
 }
 /* Thin gradient "decoration" bar Streamlit shows at the very top */
 div[data-testid="stDecoration"] {
     background-image: none !important;
-    background-color: #0f1117 !important;
+    background-color: #ffffff !important;
 }
 [data-testid="stToolbar"] {
     background-color: transparent !important;
-    color: #e2e8f0 !important;
+    color: #1e293b !important;
 }
 [data-testid="stToolbar"] svg {
-    fill: #94a3b8 !important;
+    fill: #475569 !important;
 }
 
-/* File uploader — untouched by earlier CSS, so it rendered in Streamlit's
-   default light widget style */
+/* File uploader */
 [data-testid="stFileUploader"] section,
 [data-testid="stFileUploaderDropzone"] {
-    background-color: #0f1117 !important;
-    border: 1px dashed #2d3148 !important;
+    background-color: #f8fafc !important;
+    border: 1px dashed #cbd5e1 !important;
     border-radius: 8px !important;
 }
 [data-testid="stFileUploaderDropzoneInstructions"] * {
-    color: #64748b !important;
-    fill: #64748b !important;
+    color: #475569 !important;
+    fill: #475569 !important;
 }
 [data-testid="stFileUploader"] button {
-    background-color: #1a1d27 !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #2d3148 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 6px !important;
 }
 [data-testid="stFileUploaderFile"] {
-    background-color: #1a1d27 !important;
-    color: #e2e8f0 !important;
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
 }
 
 /* Selectbox / dropdown popovers render outside .stApp, so they need
-   their own override to avoid a white flash when opened */
+   their own override to stay consistent with the light theme when opened */
 div[data-baseweb="popover"],
 div[data-baseweb="menu"],
 ul[role="listbox"] {
-    background-color: #1a1d27 !important;
-    border: 1px solid #2d3148 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
 }
 ul[role="listbox"] li,
 div[data-baseweb="menu"] li {
-    background-color: #1a1d27 !important;
-    color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
 }
 ul[role="listbox"] li:hover {
-    background-color: #0f1117 !important;
-    color: #f97316 !important;
+    background-color: #f1f5f9 !important;
+    color: #ea580c !important;
 }
 
 </style>
