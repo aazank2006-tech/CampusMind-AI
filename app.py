@@ -74,6 +74,12 @@ section[data-testid="stSidebar"] label {
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
+/* Theme toggle label + track — brand orange instead of Streamlit's default red */
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+    color: #e2e8f0 !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+}
 section[data-testid="stSidebar"] input,
 section[data-testid="stSidebar"] textarea {
     background-color: #0f1117 !important;
@@ -119,32 +125,32 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 
 /* Sidebar section dividers */
 .sidebar-divider {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #475569;
-    margin: 14px 0 8px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #2d3148;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: #475569 !important;
+    margin: 14px 0 8px !important;
+    padding-bottom: 5px !important;
+    border-bottom: 1px solid #2d3148 !important;
 }
 
 /* ── Main area ── */
 .main-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0 16px;
-    border-bottom: 1px solid #2d3148;
-    margin-bottom: 20px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 16px !important;
+    border-bottom: 1px solid #2d3148 !important;
+    margin-bottom: 20px !important;
 }
 .main-header h1 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #f1f5f9;
-    margin: 0;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    color: #f1f5f9 !important;
+    margin: 0 !important;
     font-family: 'Syne', sans-serif !important;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.5px !important;
 }
 
 /* ── Chat messages ── */
@@ -159,9 +165,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     margin-bottom: 14px;
 }
 .bubble-user {
-    background: #1e3a5f;
-    border: 1px solid #2563eb;
-    color: #e2e8f0;
+    background: #1e3a5f !important;
+    border: 1px solid #2563eb !important;
+    color: #e2e8f0 !important;
     padding: 12px 16px;
     border-radius: 16px 16px 4px 16px;
     max-width: 70%;
@@ -171,9 +177,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     word-break: break-word;
 }
 .bubble-bot {
-    background: #1a1d27;
-    border: 1px solid #2d3148;
-    color: #e2e8f0;
+    background: #1a1d27 !important;
+    border: 1px solid #2d3148 !important;
+    color: #e2e8f0 !important;
     padding: 12px 16px;
     border-radius: 16px 16px 16px 4px;
     max-width: 70%;
@@ -189,48 +195,74 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     font-size: 0.9rem; font-weight: 700;
     flex-shrink: 0; margin-top: 2px;
 }
-.av-user { background: #f97316; color: #000; }
-.av-bot  { background: #2d3148; color: #e2e8f0; }
+.av-user { background: #f97316 !important; color: #000 !important; }
+.av-bot  { background: #2d3148 !important; color: #e2e8f0 !important; }
+
+/* Native st.chat_message — used for the assistant's replies. Streamlit
+   sets its own text color here based on its (OS-following) theme, which
+   is why replies could look washed-out/invisible against our forced
+   background — these overrides make it match this theme regardless. */
+[data-testid="stChatMessage"] {
+    background-color: transparent !important;
+}
+[data-testid="stChatMessageAvatarAssistant"] {
+    background-color: #2d3148 !important;
+}
+[data-testid="stChatMessageContent"],
+[data-testid="stChatMessageContent"] p,
+[data-testid="stChatMessageContent"] li,
+[data-testid="stChatMessageContent"] span,
+[data-testid="stChatMessageContent"] strong,
+[data-testid="stChatMessageContent"] em {
+    color: #e2e8f0 !important;
+}
+[data-testid="stChatMessageContent"] a {
+    color: #f97316 !important;
+}
+[data-testid="stChatMessageContent"] code {
+    background-color: #0f1117 !important;
+    color: #f97316 !important;
+}
 
 /* ── Empty state ── */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #475569;
+    color: #475569 !important;
 }
-.empty-state h2 { color: #94a3b8; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
-.empty-state p  { font-size: 0.85rem; line-height: 1.7; }
+.empty-state h2 { color: #94a3b8 !important; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+.empty-state p  { color: #475569 !important; font-size: 0.85rem; line-height: 1.7; }
 
 /* ── PDF banner ── */
 .pdf-banner {
-    background: #0f2027;
-    border: 1px solid #1e40af;
+    background: #0f2027 !important;
+    border: 1px solid #1e40af !important;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #93c5fd;
+    color: #93c5fd !important;
     margin-bottom: 16px;
 }
 
 /* ── Persona banner ── */
 .persona-banner {
-    background: #1f1508;
-    border: 1px solid #92400e;
+    background: #1f1508 !important;
+    border: 1px solid #92400e !important;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #fdba74;
+    color: #fdba74 !important;
     margin-bottom: 16px;
 }
 
 /* ── Session banner ── */
 .session-box {
-    background: #0f1117;
-    border: 1px solid #2d3148;
+    background: #0f1117 !important;
+    border: 1px solid #2d3148 !important;
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 0.72rem;
-    color: #64748b;
+    color: #64748b !important;
     word-break: break-all;
     margin-bottom: 8px;
 }
@@ -238,11 +270,11 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 /* ── Chips ── */
 .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
 .chip {
-    background: #0f1117; border: 1px solid #2d3148;
+    background: #0f1117 !important; border: 1px solid #2d3148 !important;
     border-radius: 20px; padding: 3px 10px;
-    font-size: 0.7rem; color: #64748b;
+    font-size: 0.7rem; color: #64748b !important;
 }
-.chip span { color: #f97316; font-weight: 600; }
+.chip span { color: #f97316 !important; font-weight: 600; }
 
 /* ── Chat input ── */
 [data-testid="stChatInput"] {
@@ -395,6 +427,12 @@ section[data-testid="stSidebar"] label {
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
+/* Theme toggle label + track — brand orange instead of Streamlit's default red */
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+    color: #1e293b !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+}
 section[data-testid="stSidebar"] input,
 section[data-testid="stSidebar"] textarea {
     background-color: #ffffff !important;
@@ -440,32 +478,32 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 
 /* Sidebar section dividers */
 .sidebar-divider {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #334155;
-    margin: 14px 0 8px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: #334155 !important;
+    margin: 14px 0 8px !important;
+    padding-bottom: 5px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
 }
 
 /* ── Main area ── */
 .main-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0 16px;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 20px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 16px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    margin-bottom: 20px !important;
 }
 .main-header h1 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
     font-family: 'Syne', sans-serif !important;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.5px !important;
 }
 
 /* ── Chat messages ── */
@@ -480,9 +518,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     margin-bottom: 14px;
 }
 .bubble-user {
-    background: #eff6ff;
-    border: 1px solid #2563eb;
-    color: #1e3a5f;
+    background: #eff6ff !important;
+    border: 1px solid #2563eb !important;
+    color: #1e3a5f !important;
     padding: 12px 16px;
     border-radius: 16px 16px 4px 16px;
     max-width: 70%;
@@ -492,9 +530,9 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     word-break: break-word;
 }
 .bubble-bot {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    color: #1e293b;
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
     padding: 12px 16px;
     border-radius: 16px 16px 16px 4px;
     max-width: 70%;
@@ -510,48 +548,74 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
     font-size: 0.9rem; font-weight: 700;
     flex-shrink: 0; margin-top: 2px;
 }
-.av-user { background: #f97316; color: #000; }
-.av-bot  { background: #e2e8f0; color: #334155; }
+.av-user { background: #f97316 !important; color: #000 !important; }
+.av-bot  { background: #e2e8f0 !important; color: #334155 !important; }
+
+/* Native st.chat_message — used for the assistant's replies. Streamlit
+   sets its own text color here based on its (OS-following) theme, which
+   is why replies could look washed-out/invisible against our forced
+   background — these overrides make it match this theme regardless. */
+[data-testid="stChatMessage"] {
+    background-color: transparent !important;
+}
+[data-testid="stChatMessageAvatarAssistant"] {
+    background-color: #e2e8f0 !important;
+}
+[data-testid="stChatMessageContent"],
+[data-testid="stChatMessageContent"] p,
+[data-testid="stChatMessageContent"] li,
+[data-testid="stChatMessageContent"] span,
+[data-testid="stChatMessageContent"] strong,
+[data-testid="stChatMessageContent"] em {
+    color: #1e293b !important;
+}
+[data-testid="stChatMessageContent"] a {
+    color: #ea580c !important;
+}
+[data-testid="stChatMessageContent"] code {
+    background-color: #f1f5f9 !important;
+    color: #c2410c !important;
+}
 
 /* ── Empty state ── */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #475569;
+    color: #475569 !important;
 }
-.empty-state h2 { color: #334155; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
-.empty-state p  { font-size: 0.85rem; line-height: 1.7; }
+.empty-state h2 { color: #334155 !important; font-size: 1.6rem; margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+.empty-state p  { color: #475569 !important; font-size: 0.85rem; line-height: 1.7; }
 
 /* ── PDF banner ── */
 .pdf-banner {
-    background: #eff6ff;
-    border: 1px solid #93c5fd;
+    background: #eff6ff !important;
+    border: 1px solid #93c5fd !important;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #1d4ed8;
+    color: #1d4ed8 !important;
     margin-bottom: 16px;
 }
 
 /* ── Persona banner ── */
 .persona-banner {
-    background: #fff7ed;
-    border: 1px solid #fdba74;
+    background: #fff7ed !important;
+    border: 1px solid #fdba74 !important;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 0.82rem;
-    color: #c2410c;
+    color: #c2410c !important;
     margin-bottom: 16px;
 }
 
 /* ── Session banner ── */
 .session-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 0.72rem;
-    color: #475569;
+    color: #475569 !important;
     word-break: break-all;
     margin-bottom: 8px;
 }
@@ -559,11 +623,11 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 /* ── Chips ── */
 .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
 .chip {
-    background: #f1f5f9; border: 1px solid #e2e8f0;
+    background: #f1f5f9 !important; border: 1px solid #e2e8f0 !important;
     border-radius: 20px; padding: 3px 10px;
-    font-size: 0.7rem; color: #475569;
+    font-size: 0.7rem; color: #475569 !important;
 }
-.chip span { color: #c2410c; font-weight: 600; }
+.chip span { color: #c2410c !important; font-weight: 600; }
 
 /* ── Chat input ── */
 [data-testid="stChatInput"] {
@@ -614,7 +678,7 @@ div[data-testid="stDecoration"] {
 
 /* Fixed bottom bar that wraps the chat input — not a descendant of .stApp,
    so it needs its own override or it falls back to the browser/OS theme
-   (this was the black strip you saw behind the chat box) */
+   (this was the black strip behind the chat box) */
 [data-testid="stBottom"],
 [data-testid="stBottomBlockContainer"] {
     background-color: #ffffff !important;
