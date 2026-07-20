@@ -10,6 +10,8 @@
 
 No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later.
 
+💡 Tip: If your system is on Light mode by default, kindly turn on Light mode from the left sidebar for the best viewing experience.
+
 ---
 
 ## 📖 Table of Contents
