@@ -6,9 +6,11 @@
 
 ### 🔗 Live App
 
-**[https://campusmind-ai-v2-aazankhan.streamlit.app](https://campusmind-ai-v2-aazankhan.streamlit.app/?uid=dd9586c1415e)**
+**[https://campusmind-ai-aazankhan.streamlit.app](https://campusmind-ai-aazankhan.streamlit.app)**
 
-No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later (details in [Notes on Persistence](#notes-on-persistence)).
+No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later.
+
+💡 Tip: If your system is on Light mode by default, kindly turn on Light mode from the left sidebar for the best viewing experience.
 
 ---
 
@@ -164,16 +166,15 @@ IMPORTANT PRIVACY RULES for this document:
 ## 📸 Screenshots
 
 **Main chat view** — the empty-state screen with the randomized greeting and message input.
-
-![Main chat view](screenshots/chat-view.png)
+<img width="1917" height="860" alt="chat-view" src="https://github.com/user-attachments/assets/b9ad64bb-c496-4c05-a44e-8d8a5d08216c" />
+)
 
 **Memory + persona recall in action** — the sidebar shows the live session ID, model picker, PDF uploader, and remembered facts (`Name: Aazan Khan`), while the chat itself shows the model recalling that name mid-conversation.
+<img width="1916" height="846" alt="sidebar-memory" src="https://github.com/user-attachments/assets/b7d21496-56db-4dd9-b859-2fce8af12283" />
 
-![Sidebar memory and persona recall](screenshots/sidebar-memory.png)
 
 **PDF-grounded Q&A** — a lecture PDF (`PF Lecture 16 Palindrome Function (Ex 6-5).pdf`) is loaded, and the assistant answers a question about it directly from the document, including reproducing the relevant C++ function.
-
-![PDF question and answer](screenshots/pdf-qa.png)
+<img width="1917" height="905" alt="pdf-qa" src="https://github.com/user-attachments/assets/4f19026b-be56-4633-a896-14a753e9e700" />
 
 ---
 
