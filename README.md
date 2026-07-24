@@ -8,7 +8,9 @@
 
 **[https://campusmind-ai-v2-aazankhann.streamlit.app](https://campusmind-ai-aazankhann.streamlit.app/)**
 
-No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later (details in [Notes on Persistence](#notes-on-persistence)).
+No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later.
+
+💡 Tip: If your system uses Light Mode by default, click the Light Mode button in the left sidebar to match the app's theme.
 
 ---
 
