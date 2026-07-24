@@ -6,7 +6,7 @@
 
 ### 🔗 Live App
 
-**[https://campusmind-ai-v2-aazankhan.streamlit.app](https://campusmind-ai-v2-aazankhan.streamlit.app/?uid=dd9586c1415e)**
+**[https://campusmind-ai-v2-aazankhann.streamlit.app](https://campusmind-ai-aazankhann.streamlit.app/)**
 
 No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later (details in [Notes on Persistence](#notes-on-persistence)).
 
@@ -146,7 +146,7 @@ IMPORTANT PRIVACY RULES for this document:
 |---|---|---|
 | UI / frontend | **Streamlit** | Chat interface, sidebar controls, session state |
 | LLM inference | **Groq API** | Ultra-fast hosted inference for chat and persona behavior |
-| AI models | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768` | Quality / speed / long-context tradeoffs, user-selectable |
+| AI models | `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b` | Quality / speed / long-context tradeoffs, user-selectable |
 | Fact extraction | **Python `re` (regex)** | Rule-based, non-AI extraction of name/major/year/university from user messages |
 | PDF parsing | **pdfplumber** | Extracts text from uploaded PDFs for document Q&A |
 | Persistent storage | **Firebase Firestore** + `firebase-admin` | Optional cross-session persistence for memory and chat history |
