@@ -156,7 +156,8 @@ IMPORTANT PRIVACY RULES for this document:
 
 **Main chat view** — the empty-state screen with the randomized greeting and message input.
 
-![Main chat view](screenshots/chat-view.png)
+![Main chat view]<img width="1917" height="911" alt="Chat view" src="https://github.com/user-attachments/assets/290cfb49-114b-472d-a030-a68bff701a49" />
+
 
 **Memory + persona recall in action** — the sidebar shows the live session ID, model picker, PDF uploader, and remembered facts (`Name: Aazan Khan`), while the chat itself shows the model recalling that name mid-conversation.
 
