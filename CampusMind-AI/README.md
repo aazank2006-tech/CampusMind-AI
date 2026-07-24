@@ -6,9 +6,11 @@
 
 ### 🔗 Live App
 
-**[https://campusmind-ai-v2-aazankhan.streamlit.app](https://campusmind-ai-v2-aazankhan.streamlit.app/?uid=dd9586c1415e)**
+**[https://campusmind-ai-aazankhann.streamlit.app](https://campusmind-ai-aazankhann.streamlit.app/)**
 
-No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later (details in [Notes on Persistence](#notes-on-persistence)).
+No account or login is needed — visiting the app assigns a random session ID as a `?uid=` query parameter in the URL (`get_or_create_session_id()` in `app.py`). Bookmark the URL with your `uid` in it to come back to the same memory and chat history later.
+
+💡 Tip: If your system uses Light Mode by default, click the Light Mode button in the left sidebar to match the app's theme.
 
 ---
 
@@ -46,7 +48,7 @@ University students juggle several different jobs in a single semester — write
 
 **Conversation**
 - Fast, multi-turn chat powered by Groq-hosted LLMs, with conversation history automatically trimmed to stay within context limits.
-- Model picker — swap between `llama-3.3-70b-versatile` (best quality), `llama-3.1-8b-instant` (fastest), and `mixtral-8x7b-32768` (long context) on the fly, mid-conversation.
+- Model picker — swap between `openai/gpt-oss-120b` (best overall), `openai/gpt-oss-20b` (fastest), and `qwen/qwen3.6-27b` (best for coding & reasoning) on the fly, mid-conversation.
 
 **Personas**
 - Five switchable personas — Campus Assistant, Python Tutor, Writing Coach, Study Planner, and Research Helper — each with its own system prompt.
@@ -134,19 +136,13 @@ IMPORTANT PRIVACY RULES for this document:
 --- END ---
 ```
 
-### 5. Voice transcription
-
-`transcribe_audio()` sends recorded audio bytes to Groq's hosted **`whisper-large-v3`** for transcription using the same Groq API key — implemented and callable, but not yet wired to a mic widget in `app.py`.
-
----
-
 ## 🧰 Tech Stack and AI Models
 
 | Layer | Tool / Service | Purpose |
 |---|---|---|
 | UI / frontend | **Streamlit** | Chat interface, sidebar controls, session state |
 | LLM inference | **Groq API** | Ultra-fast hosted inference for chat and persona behavior |
-| AI models | `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768` | Quality / speed / long-context tradeoffs, user-selectable |
+| AI models | `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b` | highest-quality responses and reasoning / fast, responsive chat / lexcellent for programming and technical questions |
 | Fact extraction | **Python `re` (regex)** | Rule-based, non-AI extraction of name/major/year/university from user messages |
 | PDF parsing | **pdfplumber** | Extracts text from uploaded PDFs for document Q&A |
 | Persistent storage | **Firebase Firestore** + `firebase-admin` | Optional cross-session persistence for memory and chat history |
