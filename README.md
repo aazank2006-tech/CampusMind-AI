@@ -48,7 +48,7 @@ University students juggle several different jobs in a single semester — write
 
 **Conversation**
 - Fast, multi-turn chat powered by Groq-hosted LLMs, with conversation history automatically trimmed to stay within context limits.
-- Model picker — swap between `llama-3.3-70b-versatile` (best quality), `llama-3.1-8b-instant` (fastest), and `mixtral-8x7b-32768` (long context) on the fly, mid-conversation.
+- Model picker — swap between `openai/gpt-oss-120b` (best overall), `openai/gpt-oss-20b` (fastest), and `qwen/qwen3.6-27b` (best for coding & reasoning) on the fly, mid-conversation.
 
 **Personas**
 - Five switchable personas — Campus Assistant, Python Tutor, Writing Coach, Study Planner, and Research Helper — each with its own system prompt.
@@ -135,12 +135,6 @@ IMPORTANT PRIVACY RULES for this document:
 {document text, truncated to 6000 characters}
 --- END ---
 ```
-
-### 5. Voice transcription
-
-`transcribe_audio()` sends recorded audio bytes to Groq's hosted **`whisper-large-v3`** for transcription using the same Groq API key — implemented and callable, but not yet wired to a mic widget in `app.py`.
-
----
 
 ## 🧰 Tech Stack and AI Models
 
