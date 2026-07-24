@@ -161,11 +161,13 @@ IMPORTANT PRIVACY RULES for this document:
 
 **Memory + persona recall in action** — the sidebar shows the live session ID, model picker, PDF uploader, and remembered facts (`Name: Aazan Khan`), while the chat itself shows the model recalling that name mid-conversation.
 
-![Sidebar memory and persona recall](screenshots/sidebar-memory.png)
+![Sidebar memory and persona recall]<img width="1916" height="905" alt="sidebar-memory" src="https://github.com/user-attachments/assets/0d2ccd8e-e4f2-4728-885c-366d28f2f631" />
 
-**PDF-grounded Q&A** — a lecture PDF (`PF Lecture 16 Palindrome Function (Ex 6-5).pdf`) is loaded, and the assistant answers a question about it directly from the document, including reproducing the relevant C++ function.
 
-![PDF question and answer](screenshots/pdf-qa.png)
+**PDF-grounded Q&A** — a lecture PDF (`PF Lecture 18 static and Automatic Variables.pdf`) is loaded, and the assistant answers a question about it directly from the document, including reproducing the relevant C++ function.
+
+![PDF question and answer]<img width="1906" height="862" alt="pdf qa" src="https://github.com/user-attachments/assets/ef33cf52-a5bd-4c1e-8bf9-76ed720dac03" />
+
 
 ---
 
