@@ -12,15 +12,15 @@ from groq import Groq, APIError, APIConnectionError, RateLimitError
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL      = "llama-3.3-70b-versatile"
+DEFAULT_MODEL      = "openai/gpt-oss-120b"
 DEFAULT_MAX_TOKENS = 1024
 MAX_HISTORY_TURNS  = 20
 MEMORY_FILE        = "campusmind_memory.json"
 
 AVAILABLE_MODELS = {
-    "llama-3.3-70b-versatile": "LLaMA 3.3 70B — Best quality",
-    "llama-3.1-8b-instant":    "LLaMA 3.1 8B  — Fastest",
-    "mixtral-8x7b-32768":      "Mixtral 8x7B  — Long context",
+    "openai/gpt-oss-120b": "⭐ GPT-OSS 120B — Best Overall",
+    "openai/gpt-oss-20b":  "⚡ GPT-OSS 20B — Fastest",
+    "qwen/qwen3.6-27b":    "💻 Qwen 3.6 27B — Best for Coding",
 }
 
 BASE_SYSTEM_PROMPT = """You are CampusMind AI, a friendly and knowledgeable campus assistant.
