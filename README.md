@@ -148,7 +148,7 @@ IMPORTANT PRIVACY RULES for this document:
 |---|---|---|
 | UI / frontend | **Streamlit** | Chat interface, sidebar controls, session state |
 | LLM inference | **Groq API** | Ultra-fast hosted inference for chat and persona behavior |
-| AI models | `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b` | Quality / speed / long-context tradeoffs, user-selectable |
+| AI models | `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b` | highest-quality responses and reasoning / fast, responsive chat / lexcellent for programming and technical questions |
 | Fact extraction | **Python `re` (regex)** | Rule-based, non-AI extraction of name/major/year/university from user messages |
 | PDF parsing | **pdfplumber** | Extracts text from uploaded PDFs for document Q&A |
 | Persistent storage | **Firebase Firestore** + `firebase-admin` | Optional cross-session persistence for memory and chat history |
