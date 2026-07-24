@@ -324,7 +324,7 @@ If you'd rather have real accounts instead of a bookmarkable link (so memory fol
 | Problem | Cause | Fix |
 |---|---|---|
 | "API key not set" error | `GROQ_API_KEY` missing | Set it via environment variable (local) or `st.secrets` (cloud). |
-| `⚠️ Rate limit reached` | Too many requests in a short window | Wait a few seconds; consider switching to `llama-3.1-8b-instant`. |
+| `⚠️ Rate limit reached` | Too many requests in a short window | Wait a few seconds; consider switching to `openai/gpt-oss-120b`. |
 | PDF upload fails / empty context | Scanned/image-only PDF with no extractable text | Use a text-based PDF, or OCR it first. |
 | Persona button doesn't seem to change tone | Very short/simple prompt where personas behave similarly | Ask something persona-specific (e.g. a coding question for Python Tutor) to see the difference clearly. |
 | Voice input/output not visible in UI | Backend methods (`transcribe_audio`, `text_to_speech`) exist but aren't yet wired to a mic widget | Add an audio input component (e.g. `streamlit-mic-recorder`) and call `bot.transcribe_audio()` on the captured bytes. |
