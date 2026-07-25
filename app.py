@@ -219,10 +219,100 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 [data-testid="stChatMessageContent"] a {
     color: #f97316 !important;
 }
-[data-testid="stChatMessageContent"] code {
-    background-color: #0f1117 !important;
-    color: #f97316 !important;
+
+/* Inline `code` snippets (not fenced blocks) */
+[data-testid="stChatMessageContent"] p code,
+[data-testid="stChatMessageContent"] li code {
+    background-color: #2d2d2d !important;
+    color: #ce9178 !important;
+    border: 1px solid #3c3c3c !important;
+    border-radius: 4px !important;
+    padding: 1px 5px !important;
+    font-family: 'Cascadia Code', Consolas, 'Courier New', monospace !important;
+    font-size: 0.85em !important;
 }
+
+/* ── Fenced code blocks — styled like VS Code's Dark+ theme ── */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"],
+[data-testid="stChatMessageContent"] pre {
+    background-color: #1e1e1e !important;
+    border: 1px solid #3c3c3c !important;
+    border-radius: 6px !important;
+}
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] pre,
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] code,
+[data-testid="stChatMessageContent"] pre code {
+    background-color: transparent !important;
+    color: #d4d4d4 !important;
+    font-family: 'Cascadia Code', Consolas, Menlo, 'Courier New', monospace !important;
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+}
+/* Copy-to-clipboard button + toolbar VS Code renders on hover */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] button,
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlockActionButton"] {
+    background-color: #2d2d2d !important;
+    color: #cccccc !important;
+    border: 1px solid #3c3c3c !important;
+}
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] button:hover {
+    background-color: #3c3c3c !important;
+    color: #ffffff !important;
+}
+/* Language label chip some Streamlit versions render top-right of code blocks */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] [data-testid="stCaptionContainer"] {
+    color: #858585 !important;
+}
+
+/* Prism/highlight.js syntax token colors — VS Code "Dark+" palette */
+[data-testid="stChatMessageContent"] .token.comment,
+[data-testid="stChatMessageContent"] .token.prolog,
+[data-testid="stChatMessageContent"] .token.doctype,
+[data-testid="stChatMessageContent"] .token.cdata,
+[data-testid="stChatMessageContent"] .hljs-comment { color: #6a9955 !important; font-style: italic; }
+
+[data-testid="stChatMessageContent"] .token.keyword,
+[data-testid="stChatMessageContent"] .token.selector,
+[data-testid="stChatMessageContent"] .token.important,
+[data-testid="stChatMessageContent"] .token.atrule,
+[data-testid="stChatMessageContent"] .hljs-keyword { color: #569cd6 !important; }
+
+[data-testid="stChatMessageContent"] .token.string,
+[data-testid="stChatMessageContent"] .token.char,
+[data-testid="stChatMessageContent"] .token.attr-value,
+[data-testid="stChatMessageContent"] .hljs-string { color: #ce9178 !important; }
+
+[data-testid="stChatMessageContent"] .token.function,
+[data-testid="stChatMessageContent"] .token.method,
+[data-testid="stChatMessageContent"] .hljs-title.function_,
+[data-testid="stChatMessageContent"] .hljs-function .hljs-title { color: #dcdcaa !important; }
+
+[data-testid="stChatMessageContent"] .token.number,
+[data-testid="stChatMessageContent"] .token.boolean,
+[data-testid="stChatMessageContent"] .hljs-number { color: #b5cea8 !important; }
+
+[data-testid="stChatMessageContent"] .token.class-name,
+[data-testid="stChatMessageContent"] .token.builtin,
+[data-testid="stChatMessageContent"] .hljs-title.class_,
+[data-testid="stChatMessageContent"] .hljs-built_in { color: #4ec9b0 !important; }
+
+[data-testid="stChatMessageContent"] .token.variable,
+[data-testid="stChatMessageContent"] .token.parameter,
+[data-testid="stChatMessageContent"] .hljs-variable,
+[data-testid="stChatMessageContent"] .hljs-params { color: #9cdcfe !important; }
+
+[data-testid="stChatMessageContent"] .token.operator,
+[data-testid="stChatMessageContent"] .token.punctuation,
+[data-testid="stChatMessageContent"] .hljs-operator,
+[data-testid="stChatMessageContent"] .hljs-punctuation { color: #d4d4d4 !important; }
+
+[data-testid="stChatMessageContent"] .token.property,
+[data-testid="stChatMessageContent"] .token.tag,
+[data-testid="stChatMessageContent"] .hljs-attr,
+[data-testid="stChatMessageContent"] .hljs-tag { color: #9cdcfe !important; }
+
+[data-testid="stChatMessageContent"] .token.decorator,
+[data-testid="stChatMessageContent"] .hljs-meta { color: #dcdcaa !important; }
 
 /* ── Empty state ── */
 .empty-state {
@@ -572,10 +662,100 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 [data-testid="stChatMessageContent"] a {
     color: #ea580c !important;
 }
-[data-testid="stChatMessageContent"] code {
-    background-color: #f1f5f9 !important;
-    color: #c2410c !important;
+
+/* Inline `code` snippets (not fenced blocks) */
+[data-testid="stChatMessageContent"] p code,
+[data-testid="stChatMessageContent"] li code {
+    background-color: #f3f3f3 !important;
+    color: #a31515 !important;
+    border: 1px solid #e2e2e2 !important;
+    border-radius: 4px !important;
+    padding: 1px 5px !important;
+    font-family: 'Cascadia Code', Consolas, 'Courier New', monospace !important;
+    font-size: 0.85em !important;
 }
+
+/* ── Fenced code blocks — styled like VS Code's Light+ theme ── */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"],
+[data-testid="stChatMessageContent"] pre {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e2e2 !important;
+    border-radius: 6px !important;
+}
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] pre,
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] code,
+[data-testid="stChatMessageContent"] pre code {
+    background-color: transparent !important;
+    color: #000000 !important;
+    font-family: 'Cascadia Code', Consolas, Menlo, 'Courier New', monospace !important;
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+}
+/* Copy-to-clipboard button + toolbar VS Code renders on hover */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] button,
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlockActionButton"] {
+    background-color: #f3f3f3 !important;
+    color: #424242 !important;
+    border: 1px solid #e2e2e2 !important;
+}
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] button:hover {
+    background-color: #e8e8e8 !important;
+    color: #000000 !important;
+}
+/* Language label chip some Streamlit versions render top-right of code blocks */
+[data-testid="stChatMessageContent"] [data-testid="stCodeBlock"] [data-testid="stCaptionContainer"] {
+    color: #767676 !important;
+}
+
+/* Prism/highlight.js syntax token colors — VS Code "Light+" palette */
+[data-testid="stChatMessageContent"] .token.comment,
+[data-testid="stChatMessageContent"] .token.prolog,
+[data-testid="stChatMessageContent"] .token.doctype,
+[data-testid="stChatMessageContent"] .token.cdata,
+[data-testid="stChatMessageContent"] .hljs-comment { color: #008000 !important; font-style: italic; }
+
+[data-testid="stChatMessageContent"] .token.keyword,
+[data-testid="stChatMessageContent"] .token.selector,
+[data-testid="stChatMessageContent"] .token.important,
+[data-testid="stChatMessageContent"] .token.atrule,
+[data-testid="stChatMessageContent"] .hljs-keyword { color: #0000ff !important; }
+
+[data-testid="stChatMessageContent"] .token.string,
+[data-testid="stChatMessageContent"] .token.char,
+[data-testid="stChatMessageContent"] .token.attr-value,
+[data-testid="stChatMessageContent"] .hljs-string { color: #a31515 !important; }
+
+[data-testid="stChatMessageContent"] .token.function,
+[data-testid="stChatMessageContent"] .token.method,
+[data-testid="stChatMessageContent"] .hljs-title.function_,
+[data-testid="stChatMessageContent"] .hljs-function .hljs-title { color: #795e26 !important; }
+
+[data-testid="stChatMessageContent"] .token.number,
+[data-testid="stChatMessageContent"] .token.boolean,
+[data-testid="stChatMessageContent"] .hljs-number { color: #098658 !important; }
+
+[data-testid="stChatMessageContent"] .token.class-name,
+[data-testid="stChatMessageContent"] .token.builtin,
+[data-testid="stChatMessageContent"] .hljs-title.class_,
+[data-testid="stChatMessageContent"] .hljs-built_in { color: #267f99 !important; }
+
+[data-testid="stChatMessageContent"] .token.variable,
+[data-testid="stChatMessageContent"] .token.parameter,
+[data-testid="stChatMessageContent"] .hljs-variable,
+[data-testid="stChatMessageContent"] .hljs-params { color: #001080 !important; }
+
+[data-testid="stChatMessageContent"] .token.operator,
+[data-testid="stChatMessageContent"] .token.punctuation,
+[data-testid="stChatMessageContent"] .hljs-operator,
+[data-testid="stChatMessageContent"] .hljs-punctuation { color: #000000 !important; }
+
+[data-testid="stChatMessageContent"] .token.property,
+[data-testid="stChatMessageContent"] .token.tag,
+[data-testid="stChatMessageContent"] .hljs-attr,
+[data-testid="stChatMessageContent"] .hljs-tag { color: #001080 !important; }
+
+[data-testid="stChatMessageContent"] .token.decorator,
+[data-testid="stChatMessageContent"] .hljs-meta { color: #795e26 !important; }
 
 /* ── Empty state ── */
 .empty-state {
