@@ -15,6 +15,12 @@ st.set_page_config(
 )
 
 # ── Theme toggle (☀️ Light / 🌙 Dark) ───────────────────────────────────────
+st.sidebar.markdown(
+    '<div class="app-sidebar-brand">'
+    '<span style="font-size:1.25rem">🎓</span><span>CampusMind AI</span>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 is_light_mode = st.sidebar.toggle("☀️ Light Mode", value=False, key="is_light_mode")
 st.sidebar.markdown("")
 
@@ -985,34 +991,6 @@ ul[role="listbox"] li:hover {
 
 st.markdown(LIGHT_THEME_CSS if is_light_mode else DARK_THEME_CSS, unsafe_allow_html=True)
 
-# ── Relocate app branding into Streamlit's native header row ────────────────
-# The sidebar's "🎓 CampusMind AI" and the main content's "🎓 CampusMind AI"
-# heading used to live inline in the page flow. They're now injected as two
-# small overlays into header[data-testid="stHeader"] (the bar that already
-# holds the Share/star/GitHub/⋮ icons) — one aligned over the sidebar, one
-# aligned over the main content start. Idempotent: skips re-inserting on
-# every rerun since the header persists across Streamlit reruns.
-st.markdown("""
-<script>
-(function() {
-    const header = document.querySelector('header[data-testid="stHeader"]');
-    if (!header) return;
-    if (!header.querySelector('.app-sidebar-brand')) {
-        const el = document.createElement('div');
-        el.className = 'app-sidebar-brand';
-        el.innerHTML = '<span style="font-size:1.25rem">🎓</span><span>CampusMind AI</span>';
-        header.appendChild(el);
-    }
-    if (!header.querySelector('.app-main-brand')) {
-        const el = document.createElement('div');
-        el.className = 'app-main-brand';
-        el.innerHTML = '<span style="font-size:1.8rem">🎓</span><span>CampusMind AI</span>';
-        header.appendChild(el);
-    }
-})();
-</script>
-""", unsafe_allow_html=True)
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def text_to_speech(text: str) -> bytes:
@@ -1233,6 +1211,13 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN CHAT AREA
 # ══════════════════════════════════════════════════════════════════════════════
+
+st.markdown(
+    '<div class="app-main-brand">'
+    '<span style="font-size:1.8rem">🎓</span><span>CampusMind AI</span>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 
 # Persona banner (only show when a non-default persona is active)
 if st.session_state.current_persona != "🎓 Campus Assistant":
