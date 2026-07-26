@@ -15,8 +15,6 @@ st.set_page_config(
 )
 
 # ── Theme toggle (☀️ Light / 🌙 Dark) ───────────────────────────────────────
-st.sidebar.markdown("## 🎓 CampusMind AI")
-st.sidebar.markdown("---")
 is_light_mode = st.sidebar.toggle("☀️ Light Mode", value=False, key="is_light_mode")
 st.sidebar.markdown("")
 
@@ -395,9 +393,48 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 footer { visibility: hidden; }
 
 /* ── Force dark mode on native Streamlit chrome ──────────────────────────── */
-/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) */
+/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) — also now
+   hosts the relocated app branding (see .app-sidebar-brand / .app-main-brand) */
 header[data-testid="stHeader"] {
     background-color: #0f1117 !important;
+    height: 64px !important;
+    border-bottom: 1px solid #2d3148 !important;
+}
+.app-sidebar-brand {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 240px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding-left: 1.1rem !important;
+    box-sizing: border-box !important;
+    font-family: 'Syne', sans-serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #f1f5f9 !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
+}
+.app-main-brand {
+    position: fixed !important;
+    top: 0 !important;
+    left: 240px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding-left: 2rem !important;
+    box-sizing: border-box !important;
+    font-family: 'Syne', sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px !important;
+    color: #f1f5f9 !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
 }
 /* Thin gradient "decoration" bar Streamlit shows at the very top */
 div[data-testid="stDecoration"] {
@@ -839,9 +876,48 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
 footer { visibility: hidden; }
 
 /* ── Force light mode on native Streamlit chrome ─────────────────────────── */
-/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) */
+/* Top header bar (behind Share/star/edit icons on Streamlit Cloud) — also now
+   hosts the relocated app branding (see .app-sidebar-brand / .app-main-brand) */
 header[data-testid="stHeader"] {
     background-color: #ffffff !important;
+    height: 64px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+.app-sidebar-brand {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 240px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding-left: 1.1rem !important;
+    box-sizing: border-box !important;
+    font-family: 'Syne', sans-serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
+}
+.app-main-brand {
+    position: fixed !important;
+    top: 0 !important;
+    left: 240px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding-left: 2rem !important;
+    box-sizing: border-box !important;
+    font-family: 'Syne', sans-serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px !important;
+    color: #0f172a !important;
+    z-index: 999999 !important;
+    pointer-events: none !important;
 }
 /* Thin gradient "decoration" bar Streamlit shows at the very top */
 div[data-testid="stDecoration"] {
@@ -909,6 +985,33 @@ ul[role="listbox"] li:hover {
 
 st.markdown(LIGHT_THEME_CSS if is_light_mode else DARK_THEME_CSS, unsafe_allow_html=True)
 
+# ── Relocate app branding into Streamlit's native header row ────────────────
+# The sidebar's "🎓 CampusMind AI" and the main content's "🎓 CampusMind AI"
+# heading used to live inline in the page flow. They're now injected as two
+# small overlays into header[data-testid="stHeader"] (the bar that already
+# holds the Share/star/GitHub/⋮ icons) — one aligned over the sidebar, one
+# aligned over the main content start. Idempotent: skips re-inserting on
+# every rerun since the header persists across Streamlit reruns.
+st.markdown("""
+<script>
+(function() {
+    const header = document.querySelector('header[data-testid="stHeader"]');
+    if (!header) return;
+    if (!header.querySelector('.app-sidebar-brand')) {
+        const el = document.createElement('div');
+        el.className = 'app-sidebar-brand';
+        el.innerHTML = '<span style="font-size:1.25rem">🎓</span><span>CampusMind AI</span>';
+        header.appendChild(el);
+    }
+    if (!header.querySelector('.app-main-brand')) {
+        const el = document.createElement('div');
+        el.className = 'app-main-brand';
+        el.innerHTML = '<span style="font-size:1.8rem">🎓</span><span>CampusMind AI</span>';
+        header.appendChild(el);
+    }
+})();
+</script>
+""", unsafe_allow_html=True)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -1130,14 +1233,6 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN CHAT AREA
 # ══════════════════════════════════════════════════════════════════════════════
-
-st.markdown(
-    '<div class="main-header">'
-    '<span style="font-size:2rem">🎓</span>'
-    '<h1>CampusMind AI</h1>'
-    '</div>',
-    unsafe_allow_html=True,
-)
 
 # Persona banner (only show when a non-default persona is active)
 if st.session_state.current_persona != "🎓 Campus Assistant":
