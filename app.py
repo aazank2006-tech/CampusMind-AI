@@ -423,6 +423,8 @@ header[data-testid="stHeader"] {
     color: #f1f5f9 !important;
     z-index: 999999 !important;
     pointer-events: none !important;
+    opacity: 1 !important;
+    transition: opacity 0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
 .app-main-brand {
     position: fixed !important;
@@ -441,8 +443,19 @@ header[data-testid="stHeader"] {
     color: #f1f5f9 !important;
     z-index: 999999 !important;
     pointer-events: none !important;
+    transition: left 0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
-/* Thin gradient "decoration" bar Streamlit shows at the very top */
+/* When the sidebar is collapsed there's no sidebar column to label, so hide
+   the small sidebar brand and slide the main title over to the left corner
+   (leaving room for Streamlit's own "»" expand control). Reverses smoothly
+   when the sidebar is reopened. */
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="false"]) .app-sidebar-brand {
+    opacity: 0 !important;
+}
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="false"]) .app-main-brand {
+    left: 60px !important;
+    padding-left: 0.5rem !important;
+}
 div[data-testid="stDecoration"] {
     background-image: none !important;
     background-color: #0f1117 !important;
@@ -906,6 +919,8 @@ header[data-testid="stHeader"] {
     color: #0f172a !important;
     z-index: 999999 !important;
     pointer-events: none !important;
+    opacity: 1 !important;
+    transition: opacity 0.4s cubic-bezier(0.4,0,0.2,1) !important;
 }
 .app-main-brand {
     position: fixed !important;
@@ -924,6 +939,18 @@ header[data-testid="stHeader"] {
     color: #0f172a !important;
     z-index: 999999 !important;
     pointer-events: none !important;
+    transition: left 0.4s cubic-bezier(0.4,0,0.2,1) !important;
+}
+/* When the sidebar is collapsed there's no sidebar column to label, so hide
+   the small sidebar brand and slide the main title over to the left corner
+   (leaving room for Streamlit's own "»" expand control). Reverses smoothly
+   when the sidebar is reopened. */
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="false"]) .app-sidebar-brand {
+    opacity: 0 !important;
+}
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="false"]) .app-main-brand {
+    left: 60px !important;
+    padding-left: 0.5rem !important;
 }
 /* Thin gradient "decoration" bar Streamlit shows at the very top */
 div[data-testid="stDecoration"] {
