@@ -359,4 +359,4 @@ If you'd rather have real accounts instead of a bookmarkable link (so memory fol
 
 ## 👤 Author
 
-Built by **Aazan Khan** — BS Computer Science student at International Islamic University Islamabad (IIUI), focused on Generative AI application development.
+Built by **Aazan Khan & Muhammad Ali Qadeer** — BS Computer Science student at International Islamic University Islamabad (IIUI), focused on Generative AI application development.
