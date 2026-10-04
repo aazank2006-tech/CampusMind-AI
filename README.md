@@ -120,19 +120,28 @@ Memory extraction is intentionally **not** an AI step — it's a fast, determini
 
 Whatever is captured is saved to `Memory.facts` and rendered into a plain-text block (`to_prompt_block()`) that's prepended to the system prompt on every future turn — e.g. *"Known facts about this user: - Name: Aazan - University: IIUI"* — so the LLM stays personalized without a real extraction model in the loop.
 
-### 4. Privacy-aware PDF grounding
+### 4. Retrieval-augmented PDF grounding (RAG)
 
-When a PDF is uploaded, `pdfplumber` extracts its text and `Chatbot._system_prompt()` appends the first 6,000 characters as context, wrapped in this literal instruction block:
+When a PDF is uploaded, `pdfplumber` extracts its text and `Chatbot.setup_rag()` indexes it (all the retrieval logic lives in `rag.py`):
+
+1. **Chunk** — the text is split on paragraph → line → sentence → word boundaries into ~512-token chunks, each overlapping the previous one by ~64 tokens.
+2. **Embed** — each chunk becomes a 384-dim vector with `BAAI/bge-small-en-v1.5` via `fastembed` (ONNX Runtime — no PyTorch needed). The ~70 MB model downloads on the first PDF upload.
+3. **Store** — vectors go into an in-memory FAISS index that lives on the session's `Chatbot` instance (per user, not shared, not persisted to Firestore).
+4. **Retrieve** — on every `chat()` call the user's message is embedded and the top 4 most similar chunks are injected into the system prompt, so questions about page 25 work just as well as questions about page 1. Very short follow-ups ("explain more") are searched together with the previous question.
+
+With no PDF loaded, none of this runs and chat behaves exactly as before. Uploading a new PDF replaces the previous one (`setup_rag(..., replace=False)` appends instead, so several PDFs can share one index).
+
+The retrieved excerpts are wrapped in the same privacy instructions as before:
 
 ```
-The user uploaded a document. Use it to answer questions about its academic content only.
+The user uploaded a document. The excerpts below are the passages of it most relevant to their latest message ...
 IMPORTANT PRIVACY RULES for this document:
 - NEVER mention, reveal, or repeat any person's name found in the document (teachers, professors, authors, instructors, students, or anyone else).
 - NEVER reveal emails, phone numbers, office hours, room numbers, or any personal contact details.
 - NEVER refer to who wrote or created the document.
 - Focus ONLY on the academic subject matter, concepts, topics, and educational content.
---- DOCUMENT ---
-{document text, truncated to 6000 characters}
+--- DOCUMENT EXCERPTS ---
+[Excerpt 1] ... [Excerpt 4]
 --- END ---
 ```
 
@@ -145,8 +154,10 @@ IMPORTANT PRIVACY RULES for this document:
 | AI models | `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.6-27b` | highest-quality responses and reasoning / fast, responsive chat / lexcellent for programming and technical questions |
 | Fact extraction | **Python `re` (regex)** | Rule-based, non-AI extraction of name/major/year/university from user messages |
 | PDF parsing | **pdfplumber** | Extracts text from uploaded PDFs for document Q&A |
+| Embeddings | **fastembed** (`BAAI/bge-small-en-v1.5`) | Turns PDF chunks and questions into vectors (ONNX, CPU-only) |
+| Vector store | **FAISS** (`faiss-cpu`) | In-memory similarity search over the uploaded PDF's chunks |
 | Persistent storage | **Firebase Firestore** + `firebase-admin` | Optional cross-session persistence for memory and chat history |
-| Language | **Python 3.9+** | Core application logic |
+| Language | **Python 3.10+** | Core application logic |
 | Hosting | **Streamlit Community Cloud** | Deployment of the live app |
 | Version control | **Git / GitHub** | Source control and deployment source |
 
@@ -176,7 +187,9 @@ IMPORTANT PRIVACY RULES for this document:
 ```
 campusmind-ai/
 ├── app.py                  # Streamlit interface
-├── chatbot.py              # Core chatbot logic (Groq client, memory, personas, PDF context)
+├── chatbot.py              # Core chatbot logic (Groq client, memory, personas, RAG retrieval)
+├── rag.py                  # RAG pipeline: chunking, embeddings, FAISS vector store, retrieval
+├── test_rag.py             # Tests for the RAG pipeline (pytest)
 ├── firestore_store.py      # Firestore persistence layer (memory + chat history)
 ├── requirements.txt        # Python dependencies
 ├── .streamlit/
@@ -188,7 +201,7 @@ campusmind-ai/
 
 ## 🛠 Requirements
 
-- Python 3.9+
+- Python 3.10+
 - A [Groq API key](https://console.groq.com/keys) (free tier available)
 
 `requirements.txt`:
@@ -199,6 +212,9 @@ groq>=0.9
 pdfplumber>=0.11
 gTTS>=2.5
 firebase-admin>=6.5
+faiss-cpu>=1.9
+fastembed>=0.4
+numpy>=1.26
 ```
 
 ---
@@ -326,6 +342,7 @@ If you'd rather have real accounts instead of a bookmarkable link (so memory fol
 | "API key not set" error | `GROQ_API_KEY` missing | Set it via environment variable (local) or `st.secrets` (cloud). |
 | `⚠️ Rate limit reached` | Too many requests in a short window | Wait a few seconds; consider switching to `openai/gpt-oss-120b`. |
 | PDF upload fails / empty context | Scanned/image-only PDF with no extractable text | Use a text-based PDF, or OCR it first. |
+| "Couldn't index this PDF for search" | The embedding model couldn't be loaded (first run needs internet to download ~70 MB) or `faiss-cpu`/`fastembed` aren't installed | Check the app logs, run `pip install -r requirements.txt`, and re-upload. Chat keeps working without the PDF meanwhile. |
 | Persona button doesn't seem to change tone | Very short/simple prompt where personas behave similarly | Ask something persona-specific (e.g. a coding question for Python Tutor) to see the difference clearly. |
 | Voice input/output not visible in UI | Backend methods (`transcribe_audio`, `text_to_speech`) exist but aren't yet wired to a mic widget | Add an audio input component (e.g. `streamlit-mic-recorder`) and call `bot.transcribe_audio()` on the captured bytes. |
 

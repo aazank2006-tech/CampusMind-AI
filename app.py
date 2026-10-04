@@ -1160,13 +1160,22 @@ with st.sidebar:
             with st.spinner("Reading PDF..."):
                 pdf_text = extract_pdf_text(uploaded_pdf)
             if pdf_text and st.session_state.bot:
-                st.session_state.bot.set_pdf_context(pdf_text)
-                st.session_state.pdf_loaded = True
-                st.session_state.pdf_name = uploaded_pdf.name
-                st.success(f"✅ {uploaded_pdf.name[:20]} loaded!")
+                # RAG: chunk -> embed -> index the PDF. replace=True mirrors this
+                # single-file uploader (a new upload replaces the previous PDF);
+                # pass replace=False to accumulate several PDFs in one index.
+                with st.spinner("Indexing PDF..."):
+                    n_chunks = st.session_state.bot.setup_rag(
+                        uploaded_pdf.name, pdf_text, replace=True
+                    )
+                if n_chunks:
+                    st.session_state.pdf_loaded = True
+                    st.session_state.pdf_name = uploaded_pdf.name
+                    st.success(f"✅ {uploaded_pdf.name[:20]} loaded!")
+                else:
+                    st.error("Couldn't index this PDF for search. Check the app logs.")
     else:
         if st.session_state.pdf_loaded and st.session_state.bot:
-            st.session_state.bot.clear_pdf_context()
+            st.session_state.bot.clear_rag()
             st.session_state.pdf_loaded = False
             st.session_state.pdf_name = ""
 
